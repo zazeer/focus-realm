@@ -21,19 +21,28 @@ public class UserService {
         UserResponse userResponse = new UserResponse();
 
         try {
-            user.setUser_Id(generateUserId());
-            user.setMusic_Id(defaultMusic);
-            user.setAmbient_Id(defaultAmbient);
 
-            user.setCreated_at(new Timestamp(System.currentTimeMillis()));
-            user.setPity(0);
-            user.setCoins(0);
+            if(userRepository.checkUserNameExists(user.getUsername()) == true){
+                userResponse.setErrorCode("204");
+                userResponse.setErrorMessage("Username already exists");
+            } else if (userRepository.checkEmailTaken(user.getEmail()) == true){
+                userResponse.setErrorCode("204");
+                userResponse.setErrorMessage("Email already exists");
+            } else {
+                user.setUser_Id(generateUserId());
+                user.setMusic_Id(defaultMusic);
+                user.setAmbient_Id(defaultAmbient);
 
-            userRepository.insertUser(user);
+                user.setCreated_at(new Timestamp(System.currentTimeMillis()));
+                user.setPity(0);
+                user.setCoins(0);
 
-            userResponse.setUser(user);
-            userResponse.setErrorCode("200");
-            userResponse.setErrorMessage("Success");
+                userRepository.insertUser(user);
+
+                userResponse.setUser(user);
+                userResponse.setErrorCode("200");
+                userResponse.setErrorMessage("Success");
+            }
 
         } catch (Exception e) {
             log.error("Error at UserService.insertUser");

@@ -186,5 +186,27 @@ public class UserRepository {
         return check;
     }
 
+    public boolean checkEmailTaken(String email){
+        boolean check = false;
+
+        try {
+            String checkEmailTakenSql = """
+                    SELECT COUNT (username) FROM "User" WHERE email = ?
+                    """;
+
+            int hasValue =  jdbcTemplate.queryForObject(checkEmailTakenSql, Integer.class, email);
+
+            if(hasValue > 0){
+                check = true;
+            } else  {
+                check = false;
+            }
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        return check;
+    }
 
 }
