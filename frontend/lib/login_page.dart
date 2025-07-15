@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/userapiauth.dart';
+import 'package:frontend/register_page.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -36,9 +38,9 @@ class _LoginPageState extends State<LoginPage> {
           password: _passwordController.text,
         );
 
-        final response = await ApiService.login(user);
+        final response = await UserApiService.loginUser(user);
 
-        if (response.success) {
+        if (response.errorCode == 200) {
           //jika login berhasil
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -49,7 +51,7 @@ class _LoginPageState extends State<LoginPage> {
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Login Failed: ${response.message}'),
+              content: Text('Login Failed: ${response.errorMessage}'),
               backgroundColor: Colors.red,
             ),
           );
@@ -124,9 +126,8 @@ class _LoginPageState extends State<LoginPage> {
                   return null;
                 },
               ),
-              const SizedBox(height: 60),
+              const SizedBox(height: 30),
 
-              //Login Button
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
@@ -144,7 +145,6 @@ class _LoginPageState extends State<LoginPage> {
 
               const SizedBox(height: 8),
 
-              // Register Link
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
