@@ -44,7 +44,7 @@ class _RegisterPageState extends State<RegisterPage> {
         // Panggil API register
         final response = await UserApiService.registerUser(user);
 
-        if (response.errorCode == 200) {
+        if (response.errorCode == "200") {
           // Register berhasil
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -54,6 +54,20 @@ class _RegisterPageState extends State<RegisterPage> {
           );
           // Kembali ke login page
           Navigator.pop(context);
+        } else if (response.errorCode == "204" && response.errorMessage == "Username already exists"){
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Username already exists!, Choose Another Username'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        } else if (response.errorCode == "204" && response.errorMessage == "Email already exists") {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Email already exists!, Choose Another Email'),
+              backgroundColor: Colors.red,
+            ),
+          );
         } else {
           // Register gagal
           ScaffoldMessenger.of(context).showSnackBar(
