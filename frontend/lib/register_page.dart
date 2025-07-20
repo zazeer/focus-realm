@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/userapiauth.dart';
+import 'package:frontend/themes/app_colors.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({Key? key}) : super(key: key);
@@ -62,127 +64,300 @@ class _RegisterPageState extends State<RegisterPage> {
           );
         }
       } catch (e) {
+        if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Terjadi kesalahan: $e'),
+            content: Text('An error occurred: $e'),
             backgroundColor: Colors.red,
           ),
         );
       } finally {
-        setState(() {
-          _isLoading = false;
-        });
+        if (mounted) {
+          setState(() {
+            _isLoading = false;
+          });
+        }
       }
     }
   }
+  // @override
   @override
-  @override
-  Widget build(BuildContext context){
+  Widget build(BuildContext context) {
     return Scaffold(
-    appBar: AppBar(title: const Text('Register'), backgroundColor: Colors.green, foregroundColor: Colors.white,),
-    body: Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Form(
-        key: _formKey,
-        child: SingleChildScrollView(
+      backgroundColor: AppColors.background,
+       body: Column(
+        children: [
+          _buildHeader(),
+          // Bungkus widget form card dengan Expanded
+          Expanded(
+            child: Container(
+              color: AppColors.background, 
+              child: Transform.translate(
+                offset: const Offset(0, -50),
+                child: _buildFormCard(),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Widget untuk header biru melengkung di bagian atas
+  Widget _buildHeader() {
+    return ClipPath(
+      // clipper: _HeaderClipper(),
+      child: Container(
+        height: 200,
+        color: AppColors.primary,
+        child: const Center(
+          child: Text(
+            'FOCUSREALM',
+            style: TextStyle(
+              fontFamily: 'Poppins', // Ganti dengan font Anda
+              color: AppColors.background,
+              fontSize: 36,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 2,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// Widget untuk kartu yang berisi semua elemen form
+  Widget _buildFormCard() {
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.background,
+        // Ubah borderRadius agar hanya dua sudut atas yang melengkung
+        borderRadius: const BorderRadius.only(
+          topLeft: Radius.circular(40),
+          topRight: Radius.circular(40),
+        ),
+      ),
+      child: SingleChildScrollView(
+
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+        child: Form(
+          key: _formKey,
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 32),
-
-              Icon(Icons.person
-                , size: 100, color: Colors.green),
-              const SizedBox(height: 16),
-
-              TextFormField(
-                controller : _usernameController,
-                decoration: const InputDecoration(
-                  labelText: 'Username',
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.person),
+              const Text(
+                'Sign Up',
+                style: TextStyle(
+                  color: AppColors.primary,
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
                 ),
+              ),
+              const SizedBox(height: 24),
+              _buildTextField(
+                controller: _usernameController,
+                hint: 'Username',
+                icon: Icons.person_outline,
                 validator: (value) {
-                  if (value == null || value.isEmpty){
+                  if (value == null || value.isEmpty) {
                     return "Username is required";
                   }
                   if (value.length < 3) {
                     return 'Username must be at least 3 characters';
                   }
                   return null;
-                }
+                },
               ),
               const SizedBox(height: 16),
-
-              TextFormField(
-                controller : _emailController,
-                decoration: const InputDecoration(
-                  labelText: 'Email',
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.mail),
-                ),
+              _buildTextField(
+                controller: _emailController,
+                hint: 'Email',
+                icon: Icons.email_outlined,
+                keyboardType: TextInputType.emailAddress,
                 validator: (value) {
-                  if (value == null || value.isEmpty){
+                  if (value == null || value.isEmpty) {
                     return "Email is required";
                   }
-                  if (!value.contains('@')) {
-                    return 'Email is not valid!';
+                  if (!RegExp(r'\S+@\S+\.\S+').hasMatch(value)) {
+                    return 'Please enter a valid email address';
                   }
                   return null;
-                }
+                },
               ),
               const SizedBox(height: 16),
-
-              TextFormField(
-                controller : _passwordController,
-                decoration: const InputDecoration(
-                  labelText: 'Password',
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.lock),
-                ),
+              _buildTextField(
+                controller: _passwordController,
+                hint: 'Password',
+                icon: Icons.lock_outline,
+                isPassword: true,
                 validator: (value) {
-                  if (value == null || value.isEmpty){
+                  if (value == null || value.isEmpty) {
                     return "Password is required";
                   }
                   if (value.length < 6) {
-                    return 'Password must be at least 3 characters';
+                    return 'Password must be at least 6 characters';
                   }
                   return null;
-                }
+                },
               ),
-              const SizedBox(height: 30),
-
-              SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: _isLoading ? null : _register,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                    ),
-                    child: _isLoading
-                        ? const CircularProgressIndicator(color: Colors.white)
-                        : const Text('Register'),
-                  ),
-                ),
-                const SizedBox(height: 16),
-              
-              Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Text('Already have an account? '),
-                    TextButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                      child: const Text('Login'),
-                    ),
-                  ],
-                ),
+              const SizedBox(height: 32),
+              _buildSubmitButton(),
+              const SizedBox(height: 24),
+              _buildSocialLoginDivider(),
+              const SizedBox(height: 24),
+              _buildSocialLoginButtons(),
+              const SizedBox(height: 32),
+              _buildLoginRedirect(),
             ],
           ),
         ),
+      ),
+    );
+  }  
+
+  /// Widget modular untuk text field
+  Widget _buildTextField({
+    required TextEditingController controller,
+    required String hint,
+    required IconData icon,
+    bool isPassword = false,
+    TextInputType? keyboardType,
+    String? Function(String?)? validator,
+  }) {
+    return TextFormField(
+      controller: controller,
+      obscureText: isPassword,
+      keyboardType: keyboardType,
+      decoration: InputDecoration(
+        hintText: hint,
+        prefixIcon: Icon(icon, color: AppColors.light),
+        filled: true,
+        fillColor: AppColors.background,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide.none,
         ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: AppColors.primary),
+        ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Colors.red),
+        ),
+      ),
+      validator: validator,
+    );
+  }
+  
+  /// Widget untuk tombol Sign Up dengan gradien
+  Widget _buildSubmitButton() {
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [AppColors.primary, AppColors.secondary],
+          begin: Alignment.centerLeft,
+          end: Alignment.centerRight,
+        ),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: ElevatedButton(
+        onPressed: _isLoading ? null : _register,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.transparent,
+          shadowColor: Colors.transparent,
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+        ),
+        child: _isLoading
+            ? const SizedBox(
+                height: 24,
+                width: 24,
+                child: CircularProgressIndicator(color: AppColors.background, strokeWidth: 3),
+              )
+            : const Text(
+                'Sign Up',
+                style: TextStyle(
+                  color: AppColors.background,
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
       ),
     );
   }
+
+  /// Widget untuk pemisah "Or sign up with"
+  Widget _buildSocialLoginDivider() {
+    return const Row(
+      children: [
+        Expanded(child: Divider(color: AppColors.light)),
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 8.0),
+          child: Text(
+            'Or sign up with',
+            style: TextStyle(color: AppColors.light),
+          ),
+        ),
+        Expanded(child: Divider(color: AppColors.light)),
+      ],
+    );
+  }
+
+  /// Widget untuk tombol-tombol social login
+  Widget _buildSocialLoginButtons() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        _socialButton('assets/images/google-icon.svg'),
+        const SizedBox(width: 20),
+        _socialButton('assets/images/facebook-icon.svg'),
+        const SizedBox(width: 20),
+        _socialButton('assets/images/x-icon.svg'),
+      ],
+    );
+  }
+  
+  Widget _socialButton(String assetPath) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: AppColors.background,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.grey.shade300),
+      ),
+      child: SvgPicture.asset(
+        assetPath,
+        height: 24,
+        width: 24,
+      ),
+    );
+  }
+
+  /// Widget untuk teks dan tombol navigasi ke halaman Login
+  Widget _buildLoginRedirect() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        const Text(
+          'Already Have An Account? ',
+          style: TextStyle(color: AppColors.light),
+        ),
+        GestureDetector(
+          onTap: () => Navigator.pop(context),
+          child: const Text(
+            'Login',
+            style: TextStyle(
+              color: AppColors.primary,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
 }
+
