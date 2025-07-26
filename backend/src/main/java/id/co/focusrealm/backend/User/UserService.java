@@ -100,6 +100,8 @@ public class UserService {
               }
 
           } catch (Exception e) {
+              userResponse.setErrorCode("500");
+              userResponse.setErrorMessage("Error");
               log.error("Error at UserService.fetchUser");
               throw new RuntimeException(e);
           }
