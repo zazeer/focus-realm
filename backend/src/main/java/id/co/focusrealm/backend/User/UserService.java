@@ -1,11 +1,19 @@
 package id.co.focusrealm.backend.User;
 
+import id.co.focusrealm.backend.Analytics.AnalyticsModel;
+import id.co.focusrealm.backend.Analytics.AnalyticsService;
 import id.co.focusrealm.backend.Common.Utility;
+import id.co.focusrealm.backend.UserCharacter.UserCharacterModel;
+import id.co.focusrealm.backend.UserCharacter.UserCharacterRepository;
+import id.co.focusrealm.backend.UserCharacter.UserCharacterService;
+import id.co.focusrealm.backend.UserScenery.UserSceneryModel;
+import id.co.focusrealm.backend.UserScenery.UserSceneryService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
+import java.util.Date;
 
 @Service
 @Slf4j
@@ -14,8 +22,21 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private UserCharacterService  userCharacterService;
+
+    @Autowired
+    private UserSceneryService userSceneryService;
+
+    @Autowired
+    private AnalyticsService  analyticsService;
+
     private String defaultMusic = "M001";
     private String defaultAmbient = "A001";
+    private String defaultCharacter = "CH001";
+    private String defaultScenery = "SC001";
+    @Autowired
+    private UserCharacterRepository userCharacterRepository;
 
     public UserResponse insertUser(UserModel user){
         UserResponse userResponse = new UserResponse();
@@ -29,15 +50,44 @@ public class UserService {
                 userResponse.setErrorCode("204");
                 userResponse.setErrorMessage("Email already exists");
             } else {
+
+                // Setting User Data
                 user.setUser_Id(generateUserId());
                 user.setMusic_Id(defaultMusic);
                 user.setAmbient_Id(defaultAmbient);
 
-                user.setCreated_at(new Timestamp(System.currentTimeMillis()));
+                Date created_at = (new Timestamp(System.currentTimeMillis()));
+
+                user.setCreated_at(created_at);
                 user.setPity(0);
                 user.setCoins(0);
 
                 userRepository.insertUser(user);
+
+                // Setting User Character Data
+                UserCharacterModel userCharacterModel = new UserCharacterModel();
+                userCharacterModel.setUser_id(user.getUser_Id());
+                userCharacterModel.setCharacter_id(defaultCharacter);
+                userCharacterModel.setAcquire_date(created_at);
+                userCharacterModel.setChosen_character(true);
+                userCharacterService.insertUserCharacter(userCharacterModel);
+
+                // Setting User Scenery Data
+                UserSceneryModel userSceneryModel = new UserSceneryModel();
+                userSceneryModel.setUser_id(user.getUser_Id());
+                userSceneryModel.setScenery_id(defaultScenery);
+                userSceneryModel.setAcquire_date(created_at);
+                userSceneryModel.setChosen_scenery(true);
+                userSceneryService.insertUserScenery(userSceneryModel);
+
+                // Setting User Analytics Data
+                AnalyticsModel analyticsModel = new AnalyticsModel();
+                analyticsModel.setUser_id(user.getUser_Id());
+                analyticsModel.setDaily_focus_duration(0);
+                analyticsModel.setDaily_total_session(0);
+                analyticsModel.setDaily_coins_made(0);
+                analyticsModel.setLongest_daily_streak(0);
+                analyticsService.insertAnalytics(analyticsModel);
 
                 userResponse.setUser(user);
                 userResponse.setErrorCode("200");
