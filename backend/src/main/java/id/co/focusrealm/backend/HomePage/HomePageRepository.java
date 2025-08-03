@@ -38,7 +38,7 @@ public class HomePageRepository {
     public void fetchHomePageDataByUserId(HomePageModel homePageModel){
         try {
 
-            String fetchDataSql = """
+            String fetchDataSql = """ 
                         SELECT "User".user_id, "User".username, "User".coins,
                         Character.character_id, Character.character_name, Character.file_name AS "character_file_name",
                         Scenery.scenery_id, Scenery.scenery_name, Scenery.file_name AS "scenery_file_name"
