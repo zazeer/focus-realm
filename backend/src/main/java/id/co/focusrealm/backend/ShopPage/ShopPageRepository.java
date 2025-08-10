@@ -147,6 +147,12 @@ public class ShopPageRepository {
     public void fetchShopPageByUserId(ShopPageModel shopPageModel){
         try {
 
+            String getUserCoin = """
+                    SELECT coins FROM "User" WHERE user_id = ?
+                    """;
+
+            shopPageModel.setUser_coins(jdbcTemplate.queryForObject(getUserCoin, Integer.class, shopPageModel.getUser_id()));
+
             shopPageModel.setUnobtainedScenery(getUnobtainedScenery(shopPageModel.getUser_id()));
             shopPageModel.setObtainedScenery(getObtainedScenery(shopPageModel.getUser_id()));
             shopPageModel.setUnobtainedCharacter(getUnobtainedCharacter(shopPageModel.getUser_id()));

@@ -14,6 +14,7 @@ public class ShopPageModel {
     private String user_id;
     private String scenery_id;
     private String character_id;
+    private int user_coins;
 
     private ArrayList<UnobtainedCharacterModel> unobtainedCharacter;
     private ArrayList<UnobtainedSceneryModel>  unobtainedScenery;
