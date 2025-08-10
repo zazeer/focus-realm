@@ -19,7 +19,7 @@ public class GalleryPageRepository {
 
     public ArrayList<UnobtainedCharacterModel> getUnobtainedCharacter(String user_id) {
 
-        String sql = "SELECT c.character_id, c.character_name, c.character_rarity, c.price, c.release_date, c.file_name\n" +
+        String sql = "SELECT c.character_id, c.character_name, c.character_rarity, c.price, c.release_date, c.file_name, c.character_description\n" +
                 "FROM character c \n" +
                 "LEFT JOIN usercharacter uc ON c.character_id = uc.character_id AND uc.user_id = ?\n" +
                 "WHERE uc.character_id IS NULL";
@@ -31,6 +31,7 @@ public class GalleryPageRepository {
                 character.setCharacter_id(rs.getString("character_id"));
                 character.setCharacter_name(rs.getString("character_name"));
                 character.setCharacter_rarity(rs.getString("character_rarity"));
+                character.setCharacter_description(rs.getString("character_description"));
                 character.setPrice(rs.getInt("price"));
                 character.setFile_name(rs.getString("file_name"));
                 character.setRelease_date(rs.getDate("release_date"));
@@ -48,7 +49,7 @@ public class GalleryPageRepository {
 
     public ArrayList<ObtainedCharacterModel> getObtainedCharacter(String user_id) {
 
-        String sql = "SELECT c.character_id, c.character_name, c.character_rarity, c.price, c.release_date, c.file_name, uc.acquire_date, uc.chosen_character\n" +
+        String sql = "SELECT c.character_id, c.character_name, c.character_rarity, c.price, c.release_date, c.file_name, c.character_description, uc.acquire_date, uc.chosen_character\n" +
                 "FROM character c \n" +
                 "JOIN usercharacter uc ON c.character_id = uc.character_id\n" +
                 "WHERE user_id = ?";
@@ -60,6 +61,7 @@ public class GalleryPageRepository {
                 character.setCharacter_id(rs.getString("character_id"));
                 character.setCharacter_name(rs.getString("character_name"));
                 character.setCharacter_rarity(rs.getString("character_rarity"));
+                character.setCharacter_description(rs.getString("character_description"));
                 character.setPrice(rs.getInt("price"));
                 character.setFile_name(rs.getString("file_name"));
                 character.setRelease_date(rs.getDate("release_date"));
@@ -79,7 +81,7 @@ public class GalleryPageRepository {
 
     public ArrayList<UnobtainedSceneryModel> getUnobtainedScenery(String user_id) {
 
-        String sql = "SELECT s.scenery_id, s.scenery_name, s.scenery_rarity, s.price, s.file_name, s.release_date\n" +
+        String sql = "SELECT s.scenery_id, s.scenery_name, s.scenery_rarity, s.price, s.file_name, s.release_date, s.scenery_description\n" +
                 "FROM scenery s\n" +
                 "LEFT JOIN userscenery us ON s.scenery_id = us.scenery_id AND us.user_id = ?\n" +
                 "WHERE us.scenery_id IS NULL;\n";
@@ -92,6 +94,7 @@ public class GalleryPageRepository {
                 scenery.setScenery_id(rs.getString("scenery_id"));
                 scenery.setScenery_name(rs.getString("scenery_name"));
                 scenery.setScenery_rarity(rs.getString("scenery_rarity"));
+                scenery.setScenery_description(rs.getString("scenery_description"));
                 scenery.setPrice(rs.getInt("price"));
                 scenery.setFile_name(rs.getString("file_name"));
                 scenery.setRelease_date(rs.getDate("release_date"));
@@ -109,7 +112,7 @@ public class GalleryPageRepository {
 
     public ArrayList<ObtainedSceneryModel> getObtainedScenery(String user_id) {
 
-        String sql = "SELECT s.scenery_id, s.scenery_name, s.scenery_rarity, s.price, s.file_name, s.release_date, us.acquire_date, us.chosen_scenery \n" +
+        String sql = "SELECT s.scenery_id, s.scenery_name, s.scenery_rarity, s.price, s.file_name, s.release_date, s.scenery_description, us.acquire_date, us.chosen_scenery \n" +
                 "FROM scenery s JOIN userscenery us ON us.scenery_id = s.scenery_id\n" +
                 "WHERE user_id = ?";
         ArrayList<ObtainedSceneryModel> obtainedScenery = new ArrayList<ObtainedSceneryModel>();
@@ -121,6 +124,7 @@ public class GalleryPageRepository {
                 scenery.setScenery_id(rs.getString("scenery_id"));
                 scenery.setScenery_name(rs.getString("scenery_name"));
                 scenery.setScenery_rarity(rs.getString("scenery_rarity"));
+                scenery.setScenery_description(rs.getString("scenery_description"));
                 scenery.setPrice(rs.getInt("price"));
                 scenery.setFile_name(rs.getString("file_name"));
                 scenery.setRelease_date(rs.getDate("release_date"));
