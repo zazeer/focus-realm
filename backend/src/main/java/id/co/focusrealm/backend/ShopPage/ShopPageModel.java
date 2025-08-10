@@ -1,4 +1,4 @@
-package id.co.focusrealm.backend.GalleryPage;
+package id.co.focusrealm.backend.ShopPage;
 
 import id.co.focusrealm.backend.CharacterSceneryModelPackage.ObtainedCharacterModel;
 import id.co.focusrealm.backend.CharacterSceneryModelPackage.ObtainedSceneryModel;
@@ -9,9 +9,11 @@ import lombok.Data;
 import java.util.ArrayList;
 
 @Data
-public class GalleryPageModel {
+public class ShopPageModel {
 
     private String user_id;
+    private String scenery_id;
+    private String character_id;
 
     private ArrayList<UnobtainedCharacterModel> unobtainedCharacter;
     private ArrayList<UnobtainedSceneryModel>  unobtainedScenery;

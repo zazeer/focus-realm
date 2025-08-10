@@ -1,9 +1,9 @@
 package id.co.focusrealm.backend.GalleryPage;
 
-import id.co.focusrealm.backend.GalleryPage.ModelPackage.ObtainedCharacterModel;
-import id.co.focusrealm.backend.GalleryPage.ModelPackage.ObtainedSceneryModel;
-import id.co.focusrealm.backend.GalleryPage.ModelPackage.UnobtainedCharacterModel;
-import id.co.focusrealm.backend.GalleryPage.ModelPackage.UnobtainedSceneryModel;
+import id.co.focusrealm.backend.CharacterSceneryModelPackage.ObtainedCharacterModel;
+import id.co.focusrealm.backend.CharacterSceneryModelPackage.ObtainedSceneryModel;
+import id.co.focusrealm.backend.CharacterSceneryModelPackage.UnobtainedCharacterModel;
+import id.co.focusrealm.backend.CharacterSceneryModelPackage.UnobtainedSceneryModel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;

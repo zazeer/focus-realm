@@ -1,4 +1,4 @@
-package id.co.focusrealm.backend.GalleryPage.ModelPackage;
+package id.co.focusrealm.backend.CharacterSceneryModelPackage;
 
 import lombok.Data;
 
