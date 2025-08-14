@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/Pages/login_page.dart';
+import 'package:frontend/Pages/register_page.dart';
+import 'package:frontend/Pages/home_page.dart';
 // Import pages yang sudah dibuat
 // import 'login_page.dart';
 // import 'register_page.dart';

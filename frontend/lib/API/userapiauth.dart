@@ -58,6 +58,58 @@ class UserModel {
   }
 }
 
+class HomePageModel {
+  final String userId;
+  final String username;
+  final int userCoins;
+  final String sceneryId;
+  final String sceneryName;
+  final String sceneryFileName;
+  final String characterId;
+  final String characterName;
+  final String characterFileName;
+
+  HomePageModel({
+    required this.userId,
+    required this.username,
+    required this.userCoins,
+    required this.sceneryId,
+    required this.sceneryName,
+    required this.sceneryFileName,
+    required this.characterId,
+    required this.characterName,
+    required this.characterFileName,
+  });
+
+  factory HomePageModel.fromJson(Map<String, dynamic> json) {
+    return HomePageModel(
+      userId: json['user_id'] ?? '',
+      username: json['username'] ?? '',
+      userCoins: json['user_coins'] ?? 0,
+      sceneryId: json['scenery_id'] ?? '',
+      sceneryName: json['scenery_name'] ?? '',
+      sceneryFileName: json['scenery_file_name'] ?? '',
+      characterId: json['character_id'] ?? '',
+      characterName: json['character_name'] ?? '',
+      characterFileName: json['character_file_name'] ?? '',
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'user_id': userId,
+      'username': username,
+      'user_coins': userCoins,
+      'scenery_id': sceneryId,
+      'scenery_name': sceneryName,
+      'scenery_file_name': sceneryFileName,
+      'character_id': characterId,
+      'character_name': characterName,
+      'character_file_name': characterFileName,
+    };
+  }
+}
+
 // Model untuk Response
 class UserResponse {
   final String? errorCode;
@@ -140,4 +192,28 @@ class UserApiService {
       );
     }
   }
+
+  static Future<HomePageModel?> fetchHomePageData(String userId) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/home_page/fetch_home_page_data_by_user_id'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'user_id': userId}),
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        return HomePageModel.fromJson(data);
+      }
+      return null;
+    } catch (e) {
+      print('Error fetching home page data: $e');
+      return null;
+    }
+  }
+
+
+
+
+
 }
