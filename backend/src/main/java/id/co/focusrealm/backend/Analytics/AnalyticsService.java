@@ -36,8 +36,8 @@ public class AnalyticsService {
             if(analyticsRepository.checkHasValue() == false){
                 newAnalyticsId = "AN001";
             } else {
-                String lastUserId = analyticsRepository.getLastAnalyticsId();
-                newAnalyticsId = Utility.generateNextId(lastUserId);
+                String lastAnalyticsId = analyticsRepository.getLastAnalyticsId();
+                newAnalyticsId = Utility.generateNextId(lastAnalyticsId);
             }
 
         } catch (Exception e) {

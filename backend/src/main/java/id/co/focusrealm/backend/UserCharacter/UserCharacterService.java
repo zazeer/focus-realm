@@ -16,7 +16,7 @@ public class UserCharacterService {
     @Autowired
     JdbcTemplate jdbcTemplate;
 
-    public void insertUserCharacter(UserCharacterModel userCharacterModel){
+    public String insertUserCharacter(UserCharacterModel userCharacterModel){
 
         try {
 
@@ -27,6 +27,8 @@ public class UserCharacterService {
             log.error("Error at UserCharacterService insertUserCharacter", e);
             throw new RuntimeException(e);
         }
+
+        return  userCharacterModel.getUser_character_id();
 
     }
 

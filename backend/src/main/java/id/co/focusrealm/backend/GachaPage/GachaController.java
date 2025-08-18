@@ -1,0 +1,32 @@
+package id.co.focusrealm.backend.GachaPage;
+
+import id.co.focusrealm.backend.GalleryPage.GalleryPageModel;
+import id.co.focusrealm.backend.GalleryPage.GalleryPageResponse;
+import id.co.focusrealm.backend.GalleryPage.GalleryPageService;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+@Controller
+@Slf4j
+@RequestMapping("/gacha_page")
+public class GachaController {
+
+    @Autowired
+    private GachaService gachaService;
+
+    @PostMapping("/fetch_gatcha_page_by_user_id")
+    public @ResponseBody GachaPageResponse fetchGachaPageByUserId(@RequestBody GachaModel gachaModel) {
+        try {
+            return gachaService.fetchGachaPageByUserId(gachaModel);
+        } catch (Exception e) {
+            log.error("Error At GachaController fetchGachaPageByUserId");
+            throw new RuntimeException(e);
+        }
+    }
+
+}

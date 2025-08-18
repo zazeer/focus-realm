@@ -35,6 +35,8 @@ public class UserService {
     private String defaultAmbient = "A001";
     private String defaultCharacter = "CH001";
     private String defaultScenery = "SC001";
+    private int defaultCoins = 0;
+    private int defaultPity = 100;
     @Autowired
     private UserCharacterRepository userCharacterRepository;
 
@@ -59,8 +61,8 @@ public class UserService {
                 Date created_at = (new Timestamp(System.currentTimeMillis()));
 
                 user.setCreated_at(created_at);
-                user.setPity(0);
-                user.setCoins(0);
+                user.setPity(defaultPity);
+                user.setCoins(defaultCoins);
 
                 userRepository.insertUser(user);
 

@@ -74,7 +74,7 @@ public class ShopPageRepository {
             });
 
         } catch (Exception e) {
-            log.error("Error at ShopPageRepository getUnobtainedCharacter", e);
+            log.error("Error at ShopPageRepository getObtainedCharacter", e);
             throw new RuntimeException(e);
         }
 

@@ -1,5 +1,6 @@
 package id.co.focusrealm.backend.FocusSession;
 
+import id.co.focusrealm.backend.ShopPage.ShopPageModel;
 import id.co.focusrealm.backend.UserCharacter.UserCharacterModel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +40,47 @@ public class FocusSessionRepository {
         }
 
     }
+
+    public int getUserCoin(String user_id){
+
+        int userCoin = 0;
+
+        try {
+
+            String userCoinSql = """
+                    SELECT coins FROM "User" WHERE user_id = ?
+                    """;
+
+            userCoin = jdbcTemplate.queryForObject(userCoinSql, Integer.class, user_id);
+
+        } catch (Exception e) {
+            log.error("Error at FocusSessionRepository getUserCoin", e);
+            throw new RuntimeException(e);
+        }
+
+        return userCoin;
+    }
+
+    public void updateUserCoins(FocusSessionModel focusSessionModel){
+        try {
+
+            int userCoin = getUserCoin(focusSessionModel.getUser_id());
+            int userCoinsGained = userCoin + focusSessionModel.getTotal_coins_made();
+
+            String updateUserCoinSql = """
+                    UPDATE "User"
+                    SET coins = ?
+                    WHERE user_id = ?
+                    """;
+
+            jdbcTemplate.update(updateUserCoinSql, userCoinsGained, focusSessionModel.getUser_id());
+
+        } catch (Exception e) {
+            log.error("Error at FocusSessionRepository updateUserCoins", e);
+            throw new RuntimeException(e);
+        }
+    }
+
 
     public boolean checkHasValue(){
         boolean check = false;

@@ -90,10 +90,10 @@ public class AnalyticsRepository {
         try {
 
             String AnalyticsIdByUserIdSql = """
-                        SELECT analytics_id FROM analytics where user_id = 'U001' 
+                        SELECT analytics_id FROM analytics where user_id = ? 
                     """;
 
-            analyticsId = jdbcTemplate.queryForObject(AnalyticsIdByUserIdSql, String.class);
+            analyticsId = jdbcTemplate.queryForObject(AnalyticsIdByUserIdSql, String.class, userId);
 
         } catch (Exception e) {
             log.error("Error at AnalyticsService getAnalyticsIdByUserId", e);

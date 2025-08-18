@@ -1,8 +1,10 @@
 package id.co.focusrealm.backend.ShopPage;
 
-import id.co.focusrealm.backend.GalleryPage.GalleryPageResponse;
+import id.co.focusrealm.backend.Log.LogService;
+import id.co.focusrealm.backend.PurchaseTransaction.PurchaseTransactionService;
+import id.co.focusrealm.backend.PurchaseTransaction.userCharacterPurchase.UserCharacterPurchaseService;
+import id.co.focusrealm.backend.PurchaseTransaction.userSceneryPurchase.UserSceneryPurchaseService;
 import id.co.focusrealm.backend.UserCharacter.UserCharacterModel;
-import id.co.focusrealm.backend.UserCharacter.UserCharacterRepository;
 import id.co.focusrealm.backend.UserCharacter.UserCharacterService;
 import id.co.focusrealm.backend.UserScenery.UserSceneryModel;
 import id.co.focusrealm.backend.UserScenery.UserSceneryService;
@@ -25,6 +27,18 @@ public class ShopPageService {
 
     @Autowired
     private UserSceneryService userSceneryService;
+
+    @Autowired
+    private LogService logService;
+
+    @Autowired
+    private PurchaseTransactionService purchaseTransactionService;
+
+    @Autowired
+    private UserSceneryPurchaseService userSceneryPurchaseService;
+
+    @Autowired
+    private UserCharacterPurchaseService userCharacterPurchaseService;
 
     public ShopPageResponse fetchShopPageByUserId(ShopPageModel shopPageModel){
         ShopPageResponse shopPageResponse = new ShopPageResponse();
@@ -69,7 +83,11 @@ public class ShopPageService {
                 userCharacterModel.setCharacter_id(shopPageModel.getCharacter_id());
                 userCharacterModel.setAcquire_date(created_at);
                 userCharacterModel.setChosen_character(false);
-                userCharacterService.insertUserCharacter(userCharacterModel);
+                String lastUserSceneryId = userCharacterService.insertUserCharacter(userCharacterModel);
+
+                String lastLogId = logService.insertLog(shopPageModel.getUser_id(), "Purchase", created_at);
+                String lastPurchaseTransactionId = purchaseTransactionService.insertPurchaseTransaction(lastLogId, "Character", shopPageRepository.getCharacterPrice(shopPageModel.getCharacter_id()));
+                userCharacterPurchaseService.insertUserCharacterPurchase(lastPurchaseTransactionId, lastUserSceneryId);
 
                 shopPageRepository.fetchShopPageByUserId(shopPageModel);
                 shopPageResponse.setShopPageModel(shopPageModel);
@@ -116,7 +134,11 @@ public class ShopPageService {
                 userSceneryModel.setScenery_id(shopPageModel.getScenery_id());
                 userSceneryModel.setAcquire_date(created_at);
                 userSceneryModel.setChosen_scenery(false);
-                userSceneryService.insertUserScenery(userSceneryModel);
+                String lastUserSceneryId = userSceneryService.insertUserScenery(userSceneryModel);
+
+                String lastLogId = logService.insertLog(shopPageModel.getUser_id(), "Purchase", created_at);
+                String lastPurchaseTransactionId = purchaseTransactionService.insertPurchaseTransaction(lastLogId, "Scenery", shopPageRepository.getSceneryPrice(shopPageModel.getScenery_id()));
+                userSceneryPurchaseService.insertUserSceneryPurchase(lastPurchaseTransactionId, lastUserSceneryId);
 
                 shopPageRepository.fetchShopPageByUserId(shopPageModel);
                 shopPageResponse.setShopPageModel(shopPageModel);

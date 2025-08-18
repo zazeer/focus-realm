@@ -18,7 +18,7 @@ public class UserSceneryService {
     @Autowired
     JdbcTemplate jdbcTemplate;
 
-    public void insertUserScenery(UserSceneryModel userSceneryModel){
+    public String insertUserScenery(UserSceneryModel userSceneryModel){
 
         try {
 
@@ -29,6 +29,8 @@ public class UserSceneryService {
             log.error("Error at UserSceneryService insertUserScenery", e);
             throw new RuntimeException(e);
         }
+
+        return userSceneryModel.getUser_scenery_id();
 
     }
 

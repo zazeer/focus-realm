@@ -27,6 +27,8 @@ public class FocusSessionService {
             focusSessionModel.setTotal_coins_made(calculateCoinsMade(focusSessionModel));
             focusSessionRepository.insertFocusSession(focusSessionModel);
 
+            focusSessionRepository.updateUserCoins(focusSessionModel);
+
             focusSessionResponse.setFocusSessionModel(focusSessionModel);
             focusSessionResponse.setErrorCode("200");
             focusSessionResponse.setErrorMessage("Success");
