@@ -1,5 +1,6 @@
 package id.co.focusrealm.backend.TimerPage;
 
+import id.co.focusrealm.backend.TimerPage.Models.TimerPageModel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;

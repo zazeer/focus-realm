@@ -1,11 +1,15 @@
 package id.co.focusrealm.backend.TimerPage;
 
-import id.co.focusrealm.backend.HomePage.HomePageModel;
+import id.co.focusrealm.backend.TimerPage.Models.AmbientModel;
+import id.co.focusrealm.backend.TimerPage.Models.MusicModel;
+import id.co.focusrealm.backend.TimerPage.Models.TimerPageModel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
+
+import java.util.ArrayList;
 
 @Slf4j
 @Repository
@@ -31,15 +35,19 @@ public class TimerPageRepository {
         timerPageModel.setScenery_file_name(rs.getString("scenery_file_name"));
 
         // Ambient Information For TimerPage
-        timerPageModel.setAmbient_id(rs.getString("ambient_id"));
-        timerPageModel.setAmbient_title(rs.getString("ambient_title"));
-        timerPageModel.setAmbient_file_name(rs.getString("ambient_file_name"));
+        AmbientModel ambientModel = new AmbientModel();
+        ambientModel.setAmbient_id(rs.getString("ambient_id"));
+        ambientModel.setAmbient_title(rs.getString("ambient_title"));
+        ambientModel.setAmbient_file_name(rs.getString("ambient_file_name"));
+        timerPageModel.setCurrentAmbientModel(ambientModel);
 
         // Music Information For TimerPage
-        timerPageModel.setMusic_id(rs.getString("music_id"));
-        timerPageModel.setMusic_title(rs.getString("music_title"));
-        timerPageModel.setMusic_file_name(rs.getString("music_file_name"));
-        timerPageModel.setMusic_duration(rs.getInt("duration"));
+        MusicModel musicModel = new MusicModel();
+        musicModel.setMusic_id(rs.getString("music_id"));
+        musicModel.setMusic_title(rs.getString("music_title"));
+        musicModel.setMusic_file_name(rs.getString("music_file_name"));
+        musicModel.setMusic_duration(rs.getInt("duration"));
+        timerPageModel.setCurrentMusicModel(musicModel);
 
         return timerPageModel;
     });
@@ -72,14 +80,14 @@ public class TimerPageRepository {
             timerPageModel.setScenery_file_name(result.getScenery_file_name());
             timerPageModel.setScenery_name(result.getScenery_name());
 
-            timerPageModel.setAmbient_id(result.getAmbient_id());
-            timerPageModel.setAmbient_title(result.getAmbient_title());
-            timerPageModel.setAmbient_file_name(result.getAmbient_file_name());
+            timerPageModel.getCurrentAmbientModel().setAmbient_id(result.getCurrentAmbientModel().getAmbient_id());
+            timerPageModel.getCurrentAmbientModel().setAmbient_title(result.getCurrentAmbientModel().getAmbient_title());
+            timerPageModel.getCurrentAmbientModel().setAmbient_file_name(result.getCurrentAmbientModel().getAmbient_file_name());
 
-            timerPageModel.setMusic_id(result.getMusic_id());
-            timerPageModel.setMusic_title(result.getMusic_title());
-            timerPageModel.setMusic_file_name(result.getMusic_file_name());
-            timerPageModel.setMusic_duration(result.getMusic_duration());
+            timerPageModel.getCurrentMusicModel().setMusic_id(result.getCurrentMusicModel().getMusic_id());
+            timerPageModel.getCurrentMusicModel().setMusic_title(result.getCurrentMusicModel().getMusic_title());
+            timerPageModel.getCurrentMusicModel().setMusic_file_name(result.getCurrentMusicModel().getMusic_file_name());
+            timerPageModel.getCurrentMusicModel().setMusic_duration(result.getCurrentMusicModel().getMusic_duration());
 
             timerPageModel.setCharacter_id(result.getCharacter_id());
             timerPageModel.setCharacter_name(result.getCharacter_name());
@@ -90,6 +98,55 @@ public class TimerPageRepository {
             throw new RuntimeException(e);
         }
 
+    }
+
+    public void fetchAllMusic(TimerPageModel timerPageModel){
+
+        String sql = "SELECT * FROM MUSIC";
+        ArrayList<MusicModel> allMusicList = new ArrayList<MusicModel>();
+
+        try {
+
+            jdbcTemplate.query(sql, (rs, rowNum) -> {
+                MusicModel musicModelTemp = new MusicModel();
+                musicModelTemp.setMusic_id(rs.getString("music_id"));
+                musicModelTemp.setMusic_title(rs.getString("title"));
+                musicModelTemp.setMusic_file_name(rs.getString("file_name"));
+                musicModelTemp.setMusic_duration(rs.getInt("duration"));
+                allMusicList.add(musicModelTemp);
+                return null;
+            });
+
+            timerPageModel.setAllMusicList(allMusicList);
+
+        } catch (Exception e) {
+            log.error("Error at TimerPageRepository FetchAllMusic");
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void fetchAllAmbient(TimerPageModel timerPageModel){
+
+        String sql = "SELECT * FROM AMBIENT";
+        ArrayList<AmbientModel> allAmbientList = new ArrayList<AmbientModel>();
+
+        try {
+
+            jdbcTemplate.query(sql, (rs, rowNum) -> {
+                AmbientModel ambientModelTemp = new AmbientModel();
+                ambientModelTemp.setAmbient_id(rs.getString("ambient_id"));
+                ambientModelTemp.setAmbient_title(rs.getString("title"));
+                ambientModelTemp.setAmbient_file_name(rs.getString("file_name"));
+                allAmbientList.add(ambientModelTemp);
+                return null;
+            });
+
+            timerPageModel.setAllAmbientList(allAmbientList);
+
+        } catch (Exception e) {
+            log.error("Error at TimerPageRepository FetchAllMusic");
+            throw new RuntimeException(e);
+        }
     }
 
 }

@@ -1,6 +1,8 @@
-package id.co.focusrealm.backend.TimerPage;
+package id.co.focusrealm.backend.TimerPage.Models;
 
 import lombok.Data;
+
+import java.util.ArrayList;
 
 @Data
 public class TimerPageModel {
@@ -18,16 +20,15 @@ public class TimerPageModel {
     private String character_name;
     private String character_file_name;
 
-    // Yang diperlukan dari Music
-    private String music_id;
-    private String music_title;
-    private String music_file_name;
-    private int music_duration;
+    // Yang diperlukan dari Music (Default User Music)
+    private MusicModel currentMusicModel;
 
-    // Yang diperlukan dari Ambient
-    private String ambient_id;
-    private String ambient_title;
-    private String ambient_file_name;
+    // Yang diperlukan dari Ambient (Default User Ambient)
+    private AmbientModel currentAmbientModel;
 
+    // All Music
+    private ArrayList<MusicModel> allMusicList;
 
+    // All Ambients
+    private ArrayList<AmbientModel> allAmbientList;
 }
