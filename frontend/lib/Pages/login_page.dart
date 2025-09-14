@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/API/userapiauth.dart';
 import 'package:frontend/Pages/register_page.dart';
+import 'package:frontend/Pages/home_page.dart';
 import 'package:frontend/themes/app_colors.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -45,10 +47,20 @@ class _LoginPageState extends State<LoginPage> {
         if (response.errorCode == "200") {
           //jika login berhasil
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
+            const SnackBar(
               content: Text('Login Successful!'),
               backgroundColor: Colors.green,
             ),
+          );
+          
+          // Navigate to HomePage and remove all previous routes
+          Navigator.of(context).pushAndRemoveUntil(
+            MaterialPageRoute(
+              builder: (context) => HomePage(
+                userId: response.user?.user_Id ?? '',
+              ),
+            ),
+            (route) => false,
           );
         } else if (response.errorCode == "204" && response.errorMessage == "User Not Found"){
           ScaffoldMessenger.of(context).showSnackBar(
