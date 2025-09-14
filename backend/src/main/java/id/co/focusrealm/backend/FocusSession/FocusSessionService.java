@@ -7,6 +7,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.sql.Timestamp;
+import java.util.Date;
+
 @Service
 @Slf4j
 public class FocusSessionService {
@@ -25,9 +28,18 @@ public class FocusSessionService {
             focusSessionModel.setFocus_session_id(generateFocusSessionId());
             focusSessionModel.setAnalytics_id(analyticsRepository.getAnalyticsIdByUserId(focusSessionModel.getUser_id()));
             focusSessionModel.setTotal_coins_made(calculateCoinsMade(focusSessionModel));
-            focusSessionRepository.insertFocusSession(focusSessionModel);
 
+            Date created_at = (new Timestamp(System.currentTimeMillis()));
+            focusSessionModel.setSession_date(created_at);
+
+            focusSessionRepository.insertFocusSession(focusSessionModel);
             focusSessionRepository.updateUserCoins(focusSessionModel);
+
+            AnalyticsModel tempAnalyticsModel = new AnalyticsModel();
+            tempAnalyticsModel.setUser_id(focusSessionModel.getUser_id());
+            tempAnalyticsModel.setTotal_focus_duration(focusSessionModel.getTotal_focus_duration());
+            tempAnalyticsModel.setTotal_coins_made(focusSessionModel.getTotal_coins_made());
+            analyticsRepository.updateAnalytics(tempAnalyticsModel);
 
             focusSessionResponse.setFocusSessionModel(focusSessionModel);
             focusSessionResponse.setErrorCode("200");

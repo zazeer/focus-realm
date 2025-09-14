@@ -19,6 +19,7 @@ public class HomePageController {
     @PostMapping("/fetch_home_page_data_by_user_id")
     public @ResponseBody HomePageResponse fetchHomePageDataByUserId(@RequestBody HomePageModel homePageModel) {
         try {
+            log.info("Entering HomePage, fetchHomePageDataByUserId");
             return homePageService.fetchHomePageDataByUserId(homePageModel);
         } catch (Exception e) {
             log.error("Error At HomePageController fetchHomePageDataByUserId");

@@ -20,8 +20,8 @@ public class FocusSessionRepository {
 
             String insertUserCharacterSql = """
                     INSERT INTO "focussession" (
-                    	focus_session_id, user_id, analytics_id, total_focus_duration, total_break_duration, interval, total_coins_made
-                    ) VALUES (?, ?, ?, ?, ?, ?, ?)
+                    	focus_session_id, user_id, analytics_id, total_focus_duration, total_break_duration, interval, total_coins_made, session_date
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
                     """;
 
             jdbcTemplate.update(insertUserCharacterSql,
@@ -31,7 +31,8 @@ public class FocusSessionRepository {
                     focusSessionModel.getTotal_focus_duration(),
                     focusSessionModel.getTotal_break_duration(),
                     focusSessionModel.getInterval(),
-                    focusSessionModel.getTotal_coins_made()
+                    focusSessionModel.getTotal_coins_made(),
+                    focusSessionModel.getSession_date()
             );
 
         } catch (Exception e) {

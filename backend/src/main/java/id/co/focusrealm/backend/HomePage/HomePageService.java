@@ -29,6 +29,9 @@ public class HomePageService {
             throw new RuntimeException(e);
         }
 
+        log.info("Exiting HomePage, fetchHomePageDataByUserId");
+        log.info(homePageModel.toString());
+
         return homePageResponse;
     }
 

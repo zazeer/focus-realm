@@ -85,10 +85,9 @@ public class UserService {
                 // Setting User Analytics Data
                 AnalyticsModel analyticsModel = new AnalyticsModel();
                 analyticsModel.setUser_id(user.getUser_Id());
-                analyticsModel.setDaily_focus_duration(0);
-                analyticsModel.setDaily_total_session(0);
-                analyticsModel.setDaily_coins_made(0);
-                analyticsModel.setLongest_daily_streak(0);
+                analyticsModel.setTotal_focus_duration(0);
+                analyticsModel.setTotal_focus_session(0);
+                analyticsModel.setTotal_coins_made(0);
                 analyticsService.insertAnalytics(analyticsModel);
 
                 userResponse.setUser(user);

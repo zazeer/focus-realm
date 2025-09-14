@@ -1,6 +1,5 @@
 package id.co.focusrealm.backend.Analytics;
 
-import id.co.focusrealm.backend.UserCharacter.UserCharacterModel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -19,21 +18,42 @@ public class AnalyticsRepository {
 
             String insertAnalyticsSql = """
                     INSERT INTO "analytics" (
-                    	analytics_id, user_id, daily_focus_duration, daily_total_session, daily_coins_made, longest_daily_streak
-                    ) VALUES (?, ?, ?, ?, ?, ?)
+                    	analytics_id, user_id, total_focus_duration, total_focus_session, total_coins_made
+                    ) VALUES (?, ?, ?, ?, ?)
                     """;
 
             jdbcTemplate.update(insertAnalyticsSql,
                     analyticsModel.getAnalytics_id(),
                     analyticsModel.getUser_id(),
-                    analyticsModel.getDaily_focus_duration(),
-                    analyticsModel.getDaily_total_session(),
-                    analyticsModel.getDaily_coins_made(),
-                    analyticsModel.getLongest_daily_streak()
+                    analyticsModel.getTotal_focus_duration(),
+                    analyticsModel.getTotal_focus_session(),
+                    analyticsModel.getTotal_coins_made()
             );
 
         } catch (Exception e) {
             log.info("Error in AnalyticsRepository insertAnalytics");
+            throw new RuntimeException(e);
+        }
+
+    }
+
+    public void updateAnalytics(AnalyticsModel analyticsModel){
+
+        try {
+
+            String updateAnalyticsSql = "UPDATE analytics\n" +
+                    "SET total_focus_duration = total_focus_duration + ?,\n" +
+                    "total_focus_session = total_focus_session + 1, \n" +
+                    "total_coins_made = total_coins_made + ? \n" +
+                    "WHERE user_id = ?";
+
+            jdbcTemplate.update(updateAnalyticsSql,
+                    analyticsModel.getTotal_focus_duration(),
+                    analyticsModel.getTotal_coins_made(),
+                    analyticsModel.getUser_id()
+            );
+
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
 
@@ -102,5 +122,7 @@ public class AnalyticsRepository {
 
         return analyticsId;
     }
+
+
 
 }

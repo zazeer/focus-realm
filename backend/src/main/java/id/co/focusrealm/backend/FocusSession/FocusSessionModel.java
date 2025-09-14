@@ -2,6 +2,8 @@ package id.co.focusrealm.backend.FocusSession;
 
 import lombok.Data;
 
+import java.util.Date;
+
 @Data
 public class FocusSessionModel {
     private String focus_session_id;
@@ -11,4 +13,5 @@ public class FocusSessionModel {
     private int total_break_duration;
     private int interval;
     private int total_coins_made;
+    private Date session_date;
 }

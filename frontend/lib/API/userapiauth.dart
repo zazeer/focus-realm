@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:logger/logger.dart';
 
 // Model untuk User
 class UserModel {
@@ -133,8 +134,9 @@ class UserResponse {
 
 // Service untuk API calls
 class UserApiService {
+  static final logger = Logger();
   // Ganti dengan URL backend kamu
-  static const String baseUrl = 'http://localhost:8000'; 
+  static const String baseUrl = 'http://localhost:8080'; 
   
   // Headers untuk request
   static const Map<String, String> headers = {
@@ -203,6 +205,7 @@ class UserApiService {
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
+        logger.i('Home page data: $data');
         return HomePageModel.fromJson(data);
       }
       return null;
