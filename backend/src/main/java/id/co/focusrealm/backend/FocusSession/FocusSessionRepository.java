@@ -1,11 +1,14 @@
 package id.co.focusrealm.backend.FocusSession;
 
+import id.co.focusrealm.backend.CharacterSceneryModelPackage.UnobtainedCharacterModel;
 import id.co.focusrealm.backend.ShopPage.ShopPageModel;
 import id.co.focusrealm.backend.UserCharacter.UserCharacterModel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
+
+import java.util.ArrayList;
 
 @Repository
 @Slf4j
@@ -125,6 +128,37 @@ public class FocusSessionRepository {
         }
 
         return lastFocusSessionId;
+    }
+
+    public ArrayList<FocusSessionModel> fetchAllFocusSession(String user_id, String analytics_id){
+
+        try {
+
+            String fetchAllFocusSessionByUserIdSql = "SELECT * FROM focussession \n" +
+                    "where user_id = ? AND analytics_id = ?";
+
+            ArrayList<FocusSessionModel> focusSessionModels = new ArrayList<>();
+
+            jdbcTemplate.query(fetchAllFocusSessionByUserIdSql, new Object[]{user_id, analytics_id},(rs, rowNum) -> {
+                FocusSessionModel focusSessionModel = new FocusSessionModel();
+                focusSessionModel.setFocus_session_id(rs.getString("focus_session_id"));
+                focusSessionModel.setUser_id(rs.getString("user_id"));
+                focusSessionModel.setAnalytics_id(rs.getString("analytics_id"));
+                focusSessionModel.setTotal_focus_duration(rs.getInt("total_focus_duration"));
+                focusSessionModel.setTotal_break_duration(rs.getInt("total_break_duration"));
+                focusSessionModel.setInterval(rs.getInt("interval"));
+                focusSessionModel.setTotal_coins_made(rs.getInt("total_coins_made"));
+                focusSessionModel.setSession_date(rs.getDate("session_date"));
+                focusSessionModels.add(focusSessionModel);
+                return null;
+            });
+            return focusSessionModels;
+
+        } catch (Exception e) {
+            log.error("FocusSessionRepository fetchAllFocusSessionByUserId");
+            throw new RuntimeException(e);
+        }
+
     }
 
 }

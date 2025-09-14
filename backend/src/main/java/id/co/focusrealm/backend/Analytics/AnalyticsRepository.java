@@ -1,6 +1,7 @@
 package id.co.focusrealm.backend.Analytics;
 
 import lombok.extern.slf4j.Slf4j;
+import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -123,6 +124,31 @@ public class AnalyticsRepository {
         return analyticsId;
     }
 
+    public AnalyticsModel fetchAnalyticsDataByUserId(String userId){
+        try {
 
+            String fetchAnalyticsDataByUserIdSql = "SELECT analytics_id, user_id, total_focus_duration, total_focus_session, total_coins_made\n" +
+                    "FROM analytics\n" +
+                    "WHERE user_id = ?";
+
+            AnalyticsModel analyticsModel = jdbcTemplate.queryForObject(fetchAnalyticsDataByUserIdSql, new Object[]{userId},
+                    (rs, rowNum) -> {
+                        AnalyticsModel temp = new AnalyticsModel();
+                        temp.setAnalytics_id(rs.getString("analytics_id"));
+                        temp.setUser_id(rs.getString("user_id"));
+                        temp.setTotal_coins_made(rs.getInt("total_focus_duration"));
+                        temp.setTotal_focus_session(rs.getInt("total_focus_session"));
+                        temp.setTotal_coins_made(rs.getInt("total_coins_made"));
+                        return temp;
+                    }
+            );
+
+            return analyticsModel;
+
+        } catch (Exception e) {
+            log.error("Error at AnalyticsService fetchAnalyticsDataByUserId", e);
+            throw new RuntimeException(e);
+        }
+    }
 
 }
