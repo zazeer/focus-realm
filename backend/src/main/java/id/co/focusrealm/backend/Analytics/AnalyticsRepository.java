@@ -136,7 +136,7 @@ public class AnalyticsRepository {
                         AnalyticsModel temp = new AnalyticsModel();
                         temp.setAnalytics_id(rs.getString("analytics_id"));
                         temp.setUser_id(rs.getString("user_id"));
-                        temp.setTotal_coins_made(rs.getInt("total_focus_duration"));
+                        temp.setTotal_focus_duration(rs.getInt("total_focus_duration"));
                         temp.setTotal_focus_session(rs.getInt("total_focus_session"));
                         temp.setTotal_coins_made(rs.getInt("total_coins_made"));
                         return temp;
