@@ -172,11 +172,15 @@ class UserApiService {
   // Fungsi untuk Login
   static Future<UserResponse> loginUser(UserModel user) async {
     try {
+      logger.i('Attempting to login user: ${user}');
       final response = await http.post(
         Uri.parse('$baseUrl/user/fetch_user'),
         headers: headers,
         body: jsonEncode(user.toJson()),
       );
+      logger.i('Login response status: ${response.statusCode}');
+      logger.i('Login response body: ${response.body}');
+    
 
       if (response.statusCode == 200) {
         final responseData = jsonDecode(response.body);
@@ -205,8 +209,13 @@ class UserApiService {
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        logger.i('Home page data: $data');
-        return HomePageModel.fromJson(data);
+        logger.i('Homepage data: $data');
+        
+        // Cek apakah response sukses
+        if (data['errorCode'] == '200' && data['homePageModel'] != null) {
+          // Ambil data dari homePageModel
+          return HomePageModel.fromJson(data['homePageModel']);
+        }
       }
       return null;
     } catch (e) {

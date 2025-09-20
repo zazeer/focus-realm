@@ -2,7 +2,6 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/API/userapiauth.dart';
 
-
 class HomePage extends StatefulWidget {
   final String userId;
   
@@ -48,175 +47,144 @@ class _HomePageState extends State<HomePage> {
     }
 
     return Scaffold(
-      backgroundColor: const Color(0xFF2E3440),
+      backgroundColor: const Color(0xFFFEF9FF),
       body: SafeArea(
         child: Column(
           children: [
-            // Header dengan FOCUSREALM title
+            // Header dengan background gradient dan game scene
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.all(20),
+              height: MediaQuery.of(context).size.height * 0.6,
               decoration: const BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [Color(0xFF4C9EEB), Color(0xFF5DADE2)],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
+                  colors: [Color(0xFF4C9EEB), Color(0xFF446AD4), Color(0xFF7A4AFE)],
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                ),
+                borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(30),
+                  bottomRight: Radius.circular(30),
                 ),
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              child: Stack(
                 children: [
-                  const Text(
-                    'FOCUSREALM',
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                      letterSpacing: 2,
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'Hi, ${homePageData?.username ?? 'User'}!',
-                        style: const TextStyle(
-                          fontSize: 18,
-                          color: Colors.white,
+                  // Header title dan coins
+                  Positioned(
+                    top: 20,
+                    left: 20,
+                    right: 20,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'FOCUSREALM',
+                          style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                            letterSpacing: 2,
+                          ),
                         ),
-                      ),
-                      // Coins display
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                        decoration: BoxDecoration(
-                          color: Colors.orange,
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Row(
+                        const SizedBox(height: 10),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            const Icon(Icons.monetization_on, color: Colors.white, size: 16),
-                            const SizedBox(width: 4),
-                            Text(
-                              '${homePageData?.userCoins ?? 0} Coins',
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 12,
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Hi, ${homePageData?.username ?? 'User'}!',
+                                  style: const TextStyle(
+                                    fontSize: 18,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                                const SizedBox(height: 5),
+                                const Text(
+                                  'Ready to study?',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: Colors.white70,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            // Coins display
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                              decoration: BoxDecoration(
+                                color: Colors.orange,
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: Row(
+                                children: [
+                                  const Icon(Icons.monetization_on, color: Colors.white, size: 16),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    '${homePageData?.userCoins ?? 0} Coins',
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                           ],
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                  const SizedBox(height: 10),
-                  const Text(
-                    'Ready to study?',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.white70,
+                  
+                  // Game Scene Container
+                  Positioned(
+                    bottom: 20,
+                    left: 20,
+                    right: 20,
+                    child: Container(
+                      height: 200,
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF87CEEB), // Sky blue background
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(color: Colors.white.withOpacity(0.3)),
+                      ),
+                      child: Stack(
+                        children: [
+                          // Background scenery placeholder
+                          _buildSceneryPlaceholder(),
+                          
+                          // Character placeholder
+                          Positioned(
+                            bottom: 30,
+                            left: MediaQuery.of(context).size.width * 0.4,
+                            child: _buildCharacterPlaceholder(),
+                          ),
+                          
+                        ],
+                      ),
                     ),
                   ),
                 ],
               ),
             ),
 
-            // Game Scene Area
-            Expanded(
-              flex: 2,
-              child: Container(
-                width: double.infinity,
-                margin: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFF87CEEB), Color(0xFF98D8E8)],
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                  ),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Stack(
-                  children: [
-                    // Sky and clouds
-                    Positioned.fill(
-                      child: CustomPaint(
-                        painter: SkyPainter(),
-                      ),
-                    ),
-                    // Mountains background
-                    Positioned(
-                      bottom: 80,
-                      left: 0,
-                      right: 0,
-                      child: CustomPaint(
-                        painter: MountainPainter(),
-                        size: const Size(double.infinity, 100),
-                      ),
-                    ),
-                    // Ground
-                    Positioned(
-                      bottom: 0,
-                      left: 0,
-                      right: 0,
-                      height: 80,
-                      child: Container(
-                        decoration: const BoxDecoration(
-                          color: Color(0xFF8B4513),
-                          borderRadius: BorderRadius.only(
-                            bottomLeft: Radius.circular(20),
-                            bottomRight: Radius.circular(20),
-                          ),
-                        ),
-                      ),
-                    ),
-                    // Trees
-                    Positioned(
-                      bottom: 40,
-                      left: 30,
-                      child: CustomPaint(painter: TreePainter(), size: const Size(30, 40)),
-                    ),
-                    Positioned(
-                      bottom: 40,
-                      left: 80,
-                      child: CustomPaint(painter: TreePainter(), size: const Size(25, 35)),
-                    ),
-                    Positioned(
-                      bottom: 40,
-                      right: 30,
-                      child: CustomPaint(painter: TreePainter(), size: const Size(30, 40)),
-                    ),
-                    Positioned(
-                      bottom: 40,
-                      right: 80,
-                      child: CustomPaint(painter: TreePainter(), size: const Size(25, 35)),
-                    ),
-                    // Character (pixel art style)
-                    Positioned(
-                      bottom: 80,
-                      left: MediaQuery.of(context).size.width * 0.4,
-                      child: Container(
-                        width: 32,
-                        height: 32,
-                        child: CustomPaint(
-                          painter: PixelCharacterPainter(),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-
             // Timer Control Section
             Expanded(
-              flex: 1,
               child: Container(
                 margin: const EdgeInsets.all(16),
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: Color(0xFFF9FBFF),
                   borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 10,
+                      offset: const Offset(0, 5),
+                    ),
+                  ],
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -226,14 +194,14 @@ class _HomePageState extends State<HomePage> {
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
-                        color: Colors.black87,
+                        color: Color(0xFF2E77C3),
                       ),
                     ),
                     const SizedBox(height: 15),
                     
-                    // Timer selection row
+                    // Timer selection container
                     Container(
-                      padding: const EdgeInsets.all(12),
+                      padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
                         color: const Color(0xFF4C9EEB),
                         borderRadius: BorderRadius.circular(12),
@@ -241,28 +209,32 @@ class _HomePageState extends State<HomePage> {
                       child: Row(
                         children: [
                           // Timer type dropdown
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: DropdownButton<String>(
-                              value: selectedTimer,
-                              underline: const SizedBox(),
-                              items: timerTypes.map((String value) {
-                                return DropdownMenuItem<String>(
-                                  value: value,
-                                  child: Text(value, style: const TextStyle(fontSize: 12)),
-                                );
-                              }).toList(),
-                              onChanged: (String? newValue) {
-                                if (newValue != null) {
-                                  setState(() {
-                                    selectedTimer = newValue;
-                                  });
-                                }
-                              },
+                          Expanded(
+                            flex: 2,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: DropdownButton<String>(
+                                value: selectedTimer,
+                                underline: const SizedBox(),
+                                isExpanded: true,
+                                items: timerTypes.map((String value) {
+                                  return DropdownMenuItem<String>(
+                                    value: value,
+                                    child: Text(value, style: const TextStyle(fontSize: 12)),
+                                  );
+                                }).toList(),
+                                onChanged: (String? newValue) {
+                                  if (newValue != null) {
+                                    setState(() {
+                                      selectedTimer = newValue;
+                                    });
+                                  }
+                                },
+                              ),
                             ),
                           ),
                           const SizedBox(width: 12),
@@ -277,6 +249,7 @@ class _HomePageState extends State<HomePage> {
                                 });
                               },
                               child: Container(
+                                width: 50,
                                 padding: const EdgeInsets.all(8),
                                 decoration: BoxDecoration(
                                   color: selectedMinutes == minutes 
@@ -320,7 +293,6 @@ class _HomePageState extends State<HomePage> {
                         Expanded(
                           child: ElevatedButton(
                             onPressed: () {
-                              // Handle timer start
                               setState(() {
                                 isTimerRunning = !isTimerRunning;
                               });
@@ -342,7 +314,7 @@ class _HomePageState extends State<HomePage> {
                             ),
                           ),
                         ),
-                        const SizedBox(width: 10),
+                        const SizedBox(width: 12),
                         Container(
                           width: 50,
                           height: 50,
@@ -352,7 +324,7 @@ class _HomePageState extends State<HomePage> {
                           ),
                           child: const Icon(
                             Icons.settings,
-                            color: Colors.white,
+                            color: Color(0xFFF9FBFF),
                             size: 24,
                           ),
                         ),
@@ -363,10 +335,20 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
 
-            // Bottom Navigation (placeholder)
+            // Bottom Navigation
             Container(
               height: 70,
               padding: const EdgeInsets.symmetric(horizontal: 20),
+              decoration: BoxDecoration(
+                color: Color(0xFFF9FBFF),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.1),
+                    blurRadius: 10,
+                    offset: const Offset(0, -5),
+                  ),
+                ],
+              ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
@@ -384,6 +366,115 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  Widget _buildSceneryPlaceholder() {
+    bool hasScenery = homePageData?.sceneryFileName != null && 
+                      homePageData!.sceneryFileName!.isNotEmpty;
+    
+    return Container(
+      width: double.infinity,
+      height: double.infinity,
+      decoration: BoxDecoration(
+        color: hasScenery ? Colors.greenAccent : Colors.grey[300],
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: hasScenery ? Colors.green : Colors.grey,
+          width: 2,
+        ),
+      ),
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.landscape,
+              size: 40,
+              color: hasScenery ? Colors.green[800] : Colors.grey[600],
+            ),
+            const SizedBox(height: 8),
+            Text(
+              hasScenery 
+                  ? homePageData!.sceneryName ?? 'Scenery' 
+                  : 'No Scenery',
+              style: TextStyle(
+                color: hasScenery ? Colors.green[800] : Colors.grey[600],
+                fontWeight: FontWeight.bold,
+                fontSize: 12,
+              ),
+            ),
+            if (hasScenery)
+              Text(
+                homePageData!.sceneryFileName!,
+                style: TextStyle(
+                  color: Colors.green[600],
+                  fontSize: 10,
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCharacterPlaceholder() {
+    bool hasCharacter = homePageData?.characterFileName != null && 
+                        homePageData!.characterFileName!.isNotEmpty;
+    
+    return Container(
+      width: 60,
+      height: 80,
+      decoration: BoxDecoration(
+        color: hasCharacter ? Colors.greenAccent : Colors.grey[300],
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(
+          color: hasCharacter ? Colors.green : Colors.grey,
+          width: 2,
+        ),
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.person,
+            size: 30,
+            color: hasCharacter ? Colors.green[800] : Colors.grey[600],
+          ),
+          const SizedBox(height: 4),
+          Text(
+            hasCharacter 
+                ? homePageData!.characterName ?? 'Character' 
+                : 'No Char',
+            style: TextStyle(
+              color: hasCharacter ? Colors.green[800] : Colors.grey[600],
+              fontWeight: FontWeight.bold,
+              fontSize: 8,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          if (hasCharacter)
+            Text(
+              homePageData!.characterFileName!,
+              style: TextStyle(
+                color: Colors.green[600],
+                fontSize: 6,
+              ),
+              textAlign: TextAlign.center,
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCloud() {
+    return Container(
+      width: 40,
+      height: 20,
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.8),
+        borderRadius: BorderRadius.circular(20),
+      ),
+    );
+  }
+
   Widget _buildNavItem(IconData icon, bool isSelected) {
     return Container(
       padding: const EdgeInsets.all(8),
@@ -393,113 +484,9 @@ class _HomePageState extends State<HomePage> {
       ),
       child: Icon(
         icon,
-        color: isSelected ? Colors.white : Colors.grey,
+        color: isSelected ? Color(0xFFF9FBFF) : Colors.grey,
         size: 28,
       ),
     );
   }
 }
-
-// Custom painters untuk elemen visual
-class SkyPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint();
-    
-    // Draw clouds
-    paint.color = Colors.white.withOpacity(0.8);
-    
-    // Cloud 1
-    canvas.drawCircle(const Offset(60, 40), 15, paint);
-    canvas.drawCircle(const Offset(80, 40), 20, paint);
-    canvas.drawCircle(const Offset(100, 40), 15, paint);
-    
-    // Cloud 2
-    canvas.drawCircle(const Offset(200, 60), 12, paint);
-    canvas.drawCircle(const Offset(215, 60), 15, paint);
-    canvas.drawCircle(const Offset(230, 60), 12, paint);
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
-}
-
-class MountainPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()..color = const Color(0xFF708090);
-    
-    final path = Path();
-    path.moveTo(0, size.height);
-    path.lineTo(size.width * 0.3, 20);
-    path.lineTo(size.width * 0.6, 40);
-    path.lineTo(size.width * 0.8, 10);
-    path.lineTo(size.width, size.height);
-    path.close();
-    
-    canvas.drawPath(path, paint);
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
-}
-
-class TreePainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final trunkPaint = Paint()..color = const Color(0xFF8B4513);
-    final leafPaint = Paint()..color = const Color(0xFF228B22);
-    
-    // Draw trunk
-    canvas.drawRect(
-      Rect.fromLTWH(size.width * 0.4, size.height * 0.6, size.width * 0.2, size.height * 0.4),
-      trunkPaint,
-    );
-    
-    // Draw leaves (simple triangle)
-    final leafPath = Path();
-    leafPath.moveTo(size.width * 0.5, 0);
-    leafPath.lineTo(0, size.height * 0.7);
-    leafPath.lineTo(size.width, size.height * 0.7);
-    leafPath.close();
-    
-    canvas.drawPath(leafPath, leafPaint);
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
-}
-
-class PixelCharacterPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint();
-    final pixelSize = size.width / 16; // 16x16 pixel character
-    
-    // Simple pixel character (link-like)
-    // Head (beige/skin color)
-    paint.color = const Color(0xFFFFDBAC);
-    canvas.drawRect(Rect.fromLTWH(6 * pixelSize, 2 * pixelSize, 4 * pixelSize, 4 * pixelSize), paint);
-    
-    // Hat (green)
-    paint.color = const Color(0xFF228B22);
-    canvas.drawRect(Rect.fromLTWH(5 * pixelSize, 1 * pixelSize, 6 * pixelSize, 2 * pixelSize), paint);
-    
-    // Body (green tunic)
-    paint.color = const Color(0xFF228B22);
-    canvas.drawRect(Rect.fromLTWH(6 * pixelSize, 6 * pixelSize, 4 * pixelSize, 6 * pixelSize), paint);
-    
-    // Arms
-    canvas.drawRect(Rect.fromLTWH(4 * pixelSize, 7 * pixelSize, 2 * pixelSize, 4 * pixelSize), paint);
-    canvas.drawRect(Rect.fromLTWH(10 * pixelSize, 7 * pixelSize, 2 * pixelSize, 4 * pixelSize), paint);
-    
-    // Legs (brown)
-    paint.color = const Color(0xFF8B4513);
-    canvas.drawRect(Rect.fromLTWH(6 * pixelSize, 12 * pixelSize, 2 * pixelSize, 4 * pixelSize), paint);
-    canvas.drawRect(Rect.fromLTWH(8 * pixelSize, 12 * pixelSize, 2 * pixelSize, 4 * pixelSize), paint);
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
-}
-  

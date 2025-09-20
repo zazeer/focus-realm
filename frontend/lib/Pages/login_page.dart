@@ -4,7 +4,8 @@ import 'package:frontend/Pages/register_page.dart';
 import 'package:frontend/Pages/home_page.dart';
 import 'package:frontend/themes/app_colors.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-
+import 'package:logger/logger.dart';
+final logger = Logger();
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -41,8 +42,11 @@ class _LoginPageState extends State<LoginPage> {
           username: _usernameController.text.trim(),
           password: _passwordController.text,
         );
+        logger.i('Logging in with username: ${user.username}');
+        logger.i('Logging in with password: ${user.password}');
 
         final response = await UserApiService.loginUser(user);
+        logger.i('Login response user: ${response.user?.username}');
 
         if (response.errorCode == "200") {
           //jika login berhasil
