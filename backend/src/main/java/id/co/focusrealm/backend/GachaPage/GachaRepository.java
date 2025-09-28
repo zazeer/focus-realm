@@ -542,4 +542,23 @@ public class GachaRepository {
         return sceneryHistoryModels;
     }
 
+    public int getUserCoin(String user_id){
+
+        int userCoin = 0;
+
+        try {
+            String userCoinSql = """
+                    SELECT coins FROM "User" WHERE user_id = ?
+                    """;
+
+            userCoin = jdbcTemplate.queryForObject(userCoinSql, Integer.class, user_id);
+
+        } catch (Exception e) {
+            log.error("Error at FocusSessionRepository getUserCoin", e);
+            throw new RuntimeException(e);
+        }
+
+        return userCoin;
+    }
+
 }

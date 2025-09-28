@@ -65,6 +65,7 @@ public class GachaService {
         GachaPageResponse gachaPageResponse = new GachaPageResponse();
 
         try {
+
             gachaRepository.fetchUserDataGachaPage(gachaModel);
 
             // Ngambil Data Banner
@@ -92,15 +93,24 @@ public class GachaService {
         GachaPageResponse gachaPageResponse = new GachaPageResponse();
 
         try {
-            updateUserCoinPreGacha(gachaModel);
-            gachaCharacter(gachaModel);
 
-            // Refresh Page
-            fetchGachaPageByUserId(gachaModel);
+            if(checkIsUserCoinsSufficient(gachaModel) == true){
+                updateUserCoinPreGacha(gachaModel);
+                gachaCharacter(gachaModel);
 
-            gachaPageResponse.setGachaModel(gachaModel);
-            gachaPageResponse.setErrorCode("200");
-            gachaPageResponse.setErrorMessage("Success");
+                // Refresh Page
+                fetchGachaPageByUserId(gachaModel);
+
+                gachaPageResponse.setGachaModel(gachaModel);
+                gachaPageResponse.setErrorCode("200");
+                gachaPageResponse.setErrorMessage("Success");
+            } else {
+                gachaPageResponse.setGachaModel(gachaModel);
+                gachaPageResponse.setErrorCode("500");
+                gachaPageResponse.setErrorMessage("Inssuficient Coins");
+
+                fetchGachaPageByUserId(gachaModel);
+            }
 
         } catch (Exception e) {
             gachaPageResponse.setErrorCode("500");
@@ -116,15 +126,25 @@ public class GachaService {
         GachaPageResponse gachaPageResponse = new GachaPageResponse();
 
         try {
-            updateUserCoinPreGacha(gachaModel);
-            gachaScenery(gachaModel);
 
-            // Refresh Page
-            fetchGachaPageByUserId(gachaModel);
+            if(checkIsUserCoinsSufficient(gachaModel) == true){
+                updateUserCoinPreGacha(gachaModel);
+                gachaScenery(gachaModel);
 
-            gachaPageResponse.setGachaModel(gachaModel);
-            gachaPageResponse.setErrorCode("200");
-            gachaPageResponse.setErrorMessage("Success");
+                // Refresh Page
+                fetchGachaPageByUserId(gachaModel);
+
+                gachaPageResponse.setGachaModel(gachaModel);
+                gachaPageResponse.setErrorCode("200");
+                gachaPageResponse.setErrorMessage("Success");
+            } else {
+
+                gachaPageResponse.setGachaModel(gachaModel);
+                gachaPageResponse.setErrorCode("500");
+                gachaPageResponse.setErrorMessage("Inssuficient Coins");
+
+                fetchGachaPageByUserId(gachaModel);
+            }
 
         } catch (Exception e) {
             gachaPageResponse.setErrorCode("500");
@@ -517,6 +537,21 @@ public class GachaService {
         }
     }
 
+    public boolean checkIsUserCoinsSufficient(GachaModel gachaModel){
+        try {
+            int currentUserCoins = gachaRepository.getUserCoin(gachaModel.getUser_id());
+            int coinsCost = gachaModel.getGacha_amount() * defaultGachaPrice;
 
+            if(currentUserCoins < coinsCost){
+                return false;
+            } else {
+                return true;
+            }
+
+        } catch (Exception e) {
+            log.error("Error At GachaService checkIsUserCoinsSufficient");
+            throw new RuntimeException(e);
+        }
+    }
 
 }
