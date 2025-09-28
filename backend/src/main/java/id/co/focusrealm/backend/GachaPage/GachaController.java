@@ -1,8 +1,5 @@
 package id.co.focusrealm.backend.GachaPage;
 
-import id.co.focusrealm.backend.GalleryPage.GalleryPageModel;
-import id.co.focusrealm.backend.GalleryPage.GalleryPageResponse;
-import id.co.focusrealm.backend.GalleryPage.GalleryPageService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -25,6 +22,26 @@ public class GachaController {
             return gachaService.fetchGachaPageByUserId(gachaModel);
         } catch (Exception e) {
             log.error("Error At GachaController fetchGachaPageByUserId");
+            throw new RuntimeException(e);
+        }
+    }
+
+    @PostMapping("/do_gacha_character")
+    public @ResponseBody GachaPageResponse doGachaCharacter(@RequestBody GachaModel gachaModel) {
+        try {
+            return gachaService.doGachaCharacter(gachaModel);
+        } catch (Exception e) {
+            log.error("Error At GachaController doGachaCharacter");
+            throw new RuntimeException(e);
+        }
+    }
+
+    @PostMapping("/do_gacha_scenery")
+    public @ResponseBody GachaPageResponse doGachaScenery(@RequestBody GachaModel gachaModel) {
+        try {
+            return gachaService.doGachaScenery(gachaModel);
+        } catch (Exception e) {
+            log.error("Error At GachaController doGachaScenery");
             throw new RuntimeException(e);
         }
     }
