@@ -18,8 +18,7 @@ public class GalleryPageService {
         GalleryPageResponse galleryPageResponse = new GalleryPageResponse();
 
         try {
-
-            galleryPageRepository.fetchGalleryPageByUserId(galleryPageModel);
+            setGalleryPageByUserId(galleryPageModel);
 
             galleryPageResponse.setGalleryPageModel(galleryPageModel);
             galleryPageResponse.setErrorCode("200");
@@ -33,6 +32,20 @@ public class GalleryPageService {
         }
 
         return galleryPageResponse;
+    }
+
+    public void setGalleryPageByUserId(GalleryPageModel galleryPageModel){
+        try {
+
+            galleryPageModel.setUnobtainedScenery(galleryPageRepository.getUnobtainedScenery(galleryPageModel.getUser_id()));
+            galleryPageModel.setObtainedScenery(galleryPageRepository.getObtainedScenery(galleryPageModel.getUser_id()));
+            galleryPageModel.setUnobtainedCharacter(galleryPageRepository.getUnobtainedCharacter(galleryPageModel.getUser_id()));
+            galleryPageModel.setObtainedCharacter(galleryPageRepository.getObtainedCharacter(galleryPageModel.getUser_id()));
+
+        } catch (Exception e) {
+            log.error("Error at GalleryPageService fetchGalleryPageByUserId", e);
+            throw new RuntimeException(e);
+        }
     }
 
 }

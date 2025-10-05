@@ -35,7 +35,7 @@ public class HomePageRepository {
         return homePageModel;
     });
 
-    public void fetchHomePageDataByUserId(HomePageModel homePageModel){
+    public HomePageModel fetchHomePageDataByUserId(HomePageModel homePageModel){
         try {
 
             String fetchDataSql = """ 
@@ -52,17 +52,7 @@ public class HomePageRepository {
 
             HomePageModel result = jdbcTemplate.queryForObject(fetchDataSql, homePageRowMapper, homePageModel.getUser_id());
 
-            homePageModel.setUser_id(result.getUser_id());
-            homePageModel.setUsername(result.getUsername());
-            homePageModel.setUser_coins(result.getUser_coins());
-
-            homePageModel.setCharacter_id(result.getCharacter_id());
-            homePageModel.setCharacter_name(result.getCharacter_name());
-            homePageModel.setCharacter_file_name(result.getCharacter_file_name());
-
-            homePageModel.setScenery_id(result.getScenery_id());
-            homePageModel.setScenery_name(result.getScenery_name());
-            homePageModel.setScenery_file_name(result.getScenery_file_name());
+            return result;
 
         } catch (Exception e) {
             log.error("Error At HomePageRepository.fetchHomePageDataByUserId");

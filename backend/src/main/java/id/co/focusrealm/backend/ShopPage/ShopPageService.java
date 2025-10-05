@@ -45,7 +45,7 @@ public class ShopPageService {
 
         try {
 
-            shopPageRepository.fetchShopPageByUserId(shopPageModel);
+            setShopPageDataByUserId(shopPageModel);
 
             shopPageResponse.setShopPageModel(shopPageModel);
             shopPageResponse.setErrorCode("200");
@@ -66,7 +66,7 @@ public class ShopPageService {
 
         try {
             if(shopPageRepository.checkUserHaveTheCharacter(shopPageModel) == true){
-                shopPageRepository.fetchShopPageByUserId(shopPageModel);
+                setShopPageDataByUserId(shopPageModel);
                 shopPageResponse.setShopPageModel(shopPageModel);
                 shopPageResponse.setErrorCode("400");
                 shopPageResponse.setErrorMessage("User Already Have The Character");
@@ -89,13 +89,13 @@ public class ShopPageService {
                 String lastPurchaseTransactionId = purchaseTransactionService.insertPurchaseTransaction(lastLogId, "Character", shopPageRepository.getCharacterPrice(shopPageModel.getCharacter_id()));
                 userCharacterPurchaseService.insertUserCharacterPurchase(lastPurchaseTransactionId, lastUserSceneryId);
 
-                shopPageRepository.fetchShopPageByUserId(shopPageModel);
+                setShopPageDataByUserId(shopPageModel);
                 shopPageResponse.setShopPageModel(shopPageModel);
                 shopPageResponse.setErrorCode("200");
                 shopPageResponse.setErrorMessage("Successfully Purchased the character");
 
             } else {
-                shopPageRepository.fetchShopPageByUserId(shopPageModel);
+                setShopPageDataByUserId(shopPageModel);
                 shopPageResponse.setShopPageModel(shopPageModel);
                 shopPageResponse.setErrorCode("400");
                 shopPageResponse.setErrorMessage("Insufficient Coins");
@@ -117,7 +117,7 @@ public class ShopPageService {
 
         try {
             if(shopPageRepository.checkUserHaveTheScenery(shopPageModel) == true){
-                shopPageRepository.fetchShopPageByUserId(shopPageModel);
+                setShopPageDataByUserId(shopPageModel);
                 shopPageResponse.setShopPageModel(shopPageModel);
                 shopPageResponse.setErrorCode("400");
                 shopPageResponse.setErrorMessage("User Already Have The Scenery");
@@ -140,13 +140,13 @@ public class ShopPageService {
                 String lastPurchaseTransactionId = purchaseTransactionService.insertPurchaseTransaction(lastLogId, "Scenery", shopPageRepository.getSceneryPrice(shopPageModel.getScenery_id()));
                 userSceneryPurchaseService.insertUserSceneryPurchase(lastPurchaseTransactionId, lastUserSceneryId);
 
-                shopPageRepository.fetchShopPageByUserId(shopPageModel);
+                setShopPageDataByUserId(shopPageModel);
                 shopPageResponse.setShopPageModel(shopPageModel);
                 shopPageResponse.setErrorCode("200");
                 shopPageResponse.setErrorMessage("Successfully Purchased the Scenery");
 
             } else {
-                shopPageRepository.fetchShopPageByUserId(shopPageModel);
+                setShopPageDataByUserId(shopPageModel);
                 shopPageResponse.setShopPageModel(shopPageModel);
                 shopPageResponse.setErrorCode("400");
                 shopPageResponse.setErrorMessage("Insufficient Coins");
@@ -161,6 +161,21 @@ public class ShopPageService {
         }
 
         return shopPageResponse;
+    }
+
+    public void setShopPageDataByUserId(ShopPageModel shopPageModel){
+        try {
+
+            shopPageModel.setUser_coins(shopPageRepository.getUserCoin(shopPageModel.getUser_id()));
+            shopPageModel.setUnobtainedScenery(shopPageRepository.getUnobtainedScenery(shopPageModel.getUser_id()));
+            shopPageModel.setObtainedScenery(shopPageRepository.getObtainedScenery(shopPageModel.getUser_id()));
+            shopPageModel.setUnobtainedCharacter(shopPageRepository.getUnobtainedCharacter(shopPageModel.getUser_id()));
+            shopPageModel.setObtainedCharacter(shopPageRepository.getObtainedCharacter(shopPageModel.getUser_id()));
+
+        } catch (Exception e) {
+            log.error("Error at ShopPageService fetchShopPageByUserId", e);
+            throw new RuntimeException(e);
+        }
     }
 
 }

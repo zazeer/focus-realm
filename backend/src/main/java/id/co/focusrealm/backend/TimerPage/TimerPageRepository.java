@@ -52,7 +52,7 @@ public class TimerPageRepository {
         return timerPageModel;
     });
 
-    public void fetchTimerPageDataByUserId(TimerPageModel timerPageModel){
+    public TimerPageModel fetchTimerPageDataByUserId(TimerPageModel timerPageModel){
 
         try {
 
@@ -74,24 +74,7 @@ public class TimerPageRepository {
 
             TimerPageModel result = jdbcTemplate.queryForObject(fetchDataSql, timerPageRowMapper, timerPageModel.getUser_id());
 
-            timerPageModel.setUser_id(result.getUser_id());
-
-            timerPageModel.setScenery_id(result.getScenery_id());
-            timerPageModel.setScenery_file_name(result.getScenery_file_name());
-            timerPageModel.setScenery_name(result.getScenery_name());
-
-            timerPageModel.getCurrentAmbientModel().setAmbient_id(result.getCurrentAmbientModel().getAmbient_id());
-            timerPageModel.getCurrentAmbientModel().setAmbient_title(result.getCurrentAmbientModel().getAmbient_title());
-            timerPageModel.getCurrentAmbientModel().setAmbient_file_name(result.getCurrentAmbientModel().getAmbient_file_name());
-
-            timerPageModel.getCurrentMusicModel().setMusic_id(result.getCurrentMusicModel().getMusic_id());
-            timerPageModel.getCurrentMusicModel().setMusic_title(result.getCurrentMusicModel().getMusic_title());
-            timerPageModel.getCurrentMusicModel().setMusic_file_name(result.getCurrentMusicModel().getMusic_file_name());
-            timerPageModel.getCurrentMusicModel().setMusic_duration(result.getCurrentMusicModel().getMusic_duration());
-
-            timerPageModel.setCharacter_id(result.getCharacter_id());
-            timerPageModel.setCharacter_name(result.getCharacter_name());
-            timerPageModel.setCharacter_file_name(result.getCharacter_file_name());
+            return result;
 
         } catch (Exception e) {
             log.error("Error at TimerPageRepository.fetchTimerPageDataByUserId", e);
@@ -100,7 +83,7 @@ public class TimerPageRepository {
 
     }
 
-    public void fetchAllMusic(TimerPageModel timerPageModel){
+    public ArrayList<MusicModel> fetchAllMusic(TimerPageModel timerPageModel){
 
         String sql = "SELECT * FROM MUSIC";
         ArrayList<MusicModel> allMusicList = new ArrayList<MusicModel>();
@@ -117,7 +100,7 @@ public class TimerPageRepository {
                 return null;
             });
 
-            timerPageModel.setAllMusicList(allMusicList);
+            return allMusicList;
 
         } catch (Exception e) {
             log.error("Error at TimerPageRepository FetchAllMusic");
@@ -125,7 +108,7 @@ public class TimerPageRepository {
         }
     }
 
-    public void fetchAllAmbient(TimerPageModel timerPageModel){
+    public ArrayList<AmbientModel> fetchAllAmbient(TimerPageModel timerPageModel){
 
         String sql = "SELECT * FROM AMBIENT";
         ArrayList<AmbientModel> allAmbientList = new ArrayList<AmbientModel>();
@@ -141,7 +124,7 @@ public class TimerPageRepository {
                 return null;
             });
 
-            timerPageModel.setAllAmbientList(allAmbientList);
+            return allAmbientList;
 
         } catch (Exception e) {
             log.error("Error at TimerPageRepository FetchAllMusic");

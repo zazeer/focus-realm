@@ -20,7 +20,7 @@ import java.util.ArrayList;
 public class GachaRepository {
 
     @Autowired
-    JdbcTemplate jdbcTemplate;
+    private JdbcTemplate jdbcTemplate;
 
     RowMapper<GachaModel> gatchaPageRowMapper = ((rs, rowNum) -> {
         GachaModel gachaModel = new GachaModel();
@@ -32,7 +32,7 @@ public class GachaRepository {
         return gachaModel;
     });
 
-    public void fetchUserDataGachaPage(GachaModel gachaModel){
+    public GachaModel fetchUserDataGachaPage(GachaModel gachaModel){
 
         String sql = """
                 SELECT coins, pity FROM "User" WHERE user_id = ?
@@ -41,9 +41,7 @@ public class GachaRepository {
         try {
 
             GachaModel result = jdbcTemplate.queryForObject(sql, gatchaPageRowMapper, gachaModel.getUser_id());
-
-            gachaModel.setUser_pity(result.getUser_pity());
-            gachaModel.setUser_coins(result.getUser_coins());
+            return result;
 
         } catch (Exception e) {
             log.error("Error At GachaRepository fetchUserDataGachaPage");

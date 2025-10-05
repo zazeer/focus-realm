@@ -11,7 +11,7 @@ import org.springframework.stereotype.Repository;
 public class AnalyticsRepository {
 
     @Autowired
-    JdbcTemplate jdbcTemplate;
+    private JdbcTemplate jdbcTemplate;
 
     public void insertAnalytics(AnalyticsModel analyticsModel){
 

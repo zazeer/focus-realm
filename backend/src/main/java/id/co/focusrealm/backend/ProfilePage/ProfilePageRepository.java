@@ -18,7 +18,7 @@ public class ProfilePageRepository {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
-    public void fetchUserData(ProfilePageModel profilePageModel){
+    public ProfilePageModel fetchUserData(ProfilePageModel profilePageModel){
 
         try {
 
@@ -28,14 +28,17 @@ public class ProfilePageRepository {
                     "JOIN character c ON uc.character_id = c.character_id\n" +
                     "WHERE us.user_id = ? AND uc.chosen_character = true";
 
-            jdbcTemplate.queryForObject(fetchUserDataSql, new Object[]{profilePageModel.getUser_id()},
+            ProfilePageModel profilePageModelTemp = jdbcTemplate.queryForObject(fetchUserDataSql, new Object[]{profilePageModel.getUser_id()},
                     (rs, rowNum) -> {
-                        profilePageModel.setUsername(rs.getString("username"));
-                        profilePageModel.setEmail(rs.getString("email"));
-                        profilePageModel.setProfile_picture_file_name(rs.getString("file_name"));
-                        return null;
+                        ProfilePageModel temp = new ProfilePageModel();
+                        temp.setUsername(rs.getString("username"));
+                        temp.setEmail(rs.getString("email"));
+                        temp.setProfile_picture_file_name(rs.getString("file_name"));
+                        return temp;
                     }
             );
+
+            return profilePageModelTemp;
 
         } catch (Exception e) {
             log.error("ERROR At ProfilePageRepository, fetchUserData");

@@ -17,7 +17,7 @@ import java.util.ArrayList;
 public class ShopPageRepository {
 
     @Autowired
-    JdbcTemplate jdbcTemplate;
+    private JdbcTemplate jdbcTemplate;
 
     public ArrayList<UnobtainedCharacterModel> getUnobtainedCharacter(String user_id) {
 
@@ -142,26 +142,6 @@ public class ShopPageRepository {
         }
 
         return obtainedScenery;
-    }
-
-    public void fetchShopPageByUserId(ShopPageModel shopPageModel){
-        try {
-
-            String getUserCoin = """
-                    SELECT coins FROM "User" WHERE user_id = ?
-                    """;
-
-            shopPageModel.setUser_coins(jdbcTemplate.queryForObject(getUserCoin, Integer.class, shopPageModel.getUser_id()));
-
-            shopPageModel.setUnobtainedScenery(getUnobtainedScenery(shopPageModel.getUser_id()));
-            shopPageModel.setObtainedScenery(getObtainedScenery(shopPageModel.getUser_id()));
-            shopPageModel.setUnobtainedCharacter(getUnobtainedCharacter(shopPageModel.getUser_id()));
-            shopPageModel.setObtainedCharacter(getObtainedCharacter(shopPageModel.getUser_id()));
-
-        } catch (Exception e) {
-            log.error("Error at ShopPageRepository fetchShopPageByUserId", e);
-            throw new RuntimeException(e);
-        }
     }
 
     public int getUserCoin(String user_id){

@@ -66,7 +66,9 @@ public class GachaService {
 
         try {
 
-            gachaRepository.fetchUserDataGachaPage(gachaModel);
+            GachaModel temp = gachaRepository.fetchUserDataGachaPage(gachaModel);
+            gachaModel.setUser_pity(temp.getUser_pity());
+            gachaModel.setUser_coins(temp.getUser_coins());
 
             // Ngambil Data Banner
             gachaModel.setCurrentCharacterBanner(gachaRepository.fetchCharacterData(currentCharacterBannerId));

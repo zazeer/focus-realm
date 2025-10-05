@@ -28,7 +28,11 @@ public class ProfilePageService {
         ProfilePageResponse profilePageResponse = new ProfilePageResponse();
 
         try {
-            profilePageRepository.fetchUserData(profilePageModel);
+            ProfilePageModel temporary = profilePageRepository.fetchUserData(profilePageModel);
+            profilePageModel.setUsername(temporary.getUsername());
+            profilePageModel.setEmail(temporary.getEmail());
+            profilePageModel.setProfile_picture_file_name(temporary.getProfile_picture_file_name());
+
             profilePageModel.setAllTimeUserStatistics(analyticsRepository.fetchAnalyticsDataByUserId(profilePageModel.getUser_id()));
             profilePageModel.setAllUserFocusSessionList(focusSessionRepository.fetchAllFocusSession(profilePageModel.getUser_id(), profilePageModel.getAllTimeUserStatistics().getAnalytics_id()));
 

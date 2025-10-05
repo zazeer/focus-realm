@@ -17,9 +17,9 @@ public class TimerPageService {
 
         try {
 
-            timerPageRepository.fetchTimerPageDataByUserId(timerPageModel);
-            timerPageRepository.fetchAllMusic(timerPageModel);
-            timerPageRepository.fetchAllAmbient(timerPageModel);
+            timerPageModel = timerPageRepository.fetchTimerPageDataByUserId(timerPageModel);
+            timerPageModel.setAllMusicList(timerPageRepository.fetchAllMusic(timerPageModel));
+            timerPageModel.setAllAmbientList(timerPageRepository.fetchAllAmbient(timerPageModel));
 
             timerPageResponse.setTimerPageModel(timerPageModel);
             timerPageResponse.setErrorCode("200");

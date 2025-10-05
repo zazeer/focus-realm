@@ -16,7 +16,7 @@ import java.util.ArrayList;
 public class CustomizationPageRepository {
 
     @Autowired
-    JdbcTemplate jdbcTemplate;
+    private JdbcTemplate jdbcTemplate;
 
     public ArrayList<UnobtainedCharacterModel> getUnobtainedCharacter(String user_id) {
 
@@ -202,22 +202,6 @@ public class CustomizationPageRepository {
         }
 
         return obtainedScenery;
-    }
-
-    public void fetchCustomizationPageById(CustomizationPageModel customizationPageModel){
-        try {
-            customizationPageModel.setUnobtainedScenery(getUnobtainedScenery(customizationPageModel.getUser_id()));
-            customizationPageModel.setCurrentlyUsedScenery(getCurrentlyUsedScenery(customizationPageModel.getUser_id()));
-            customizationPageModel.setObtainedScenery(getObtainedSceneryExcludingCurrentlyUsed(customizationPageModel.getUser_id()));
-
-            customizationPageModel.setUnobtainedCharacter(getUnobtainedCharacter(customizationPageModel.getUser_id()));
-            customizationPageModel.setCurrentlyUsedCharacter(getCurrentlyUsedCharacter(customizationPageModel.getUser_id()));
-            customizationPageModel.setObtainedCharacter(getObtainedCharacterExcludingCurrentlyUsed(customizationPageModel.getUser_id()));
-
-        } catch (Exception e) {
-            log.error("Error at CustomizationPageRepository fetchCustomizationPageById", e);
-            throw new RuntimeException(e);
-        }
     }
 
     public void changeChosenCharacter(CustomizationPageModel customizationPageModel){

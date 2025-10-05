@@ -16,7 +16,7 @@ public class UserSceneryService {
     private UserSceneryRepository userSceneryRepository;
 
     @Autowired
-    JdbcTemplate jdbcTemplate;
+    private JdbcTemplate jdbcTemplate;
 
     public String insertUserScenery(UserSceneryModel userSceneryModel){
 

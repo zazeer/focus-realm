@@ -11,12 +11,12 @@ public class HomePageService {
     @Autowired
     private HomePageRepository homePageRepository;
 
-    public HomePageResponse fetchHomePageDataByUserId(HomePageModel  homePageModel){
+    public HomePageResponse fetchHomePageDataByUserId(HomePageModel homePageModel){
         HomePageResponse homePageResponse = new HomePageResponse();
 
         try {
 
-            homePageRepository.fetchHomePageDataByUserId(homePageModel);
+            homePageModel = homePageRepository.fetchHomePageDataByUserId(homePageModel);
 
             homePageResponse.setHomePageModel(homePageModel);
             homePageResponse.setErrorCode("200");

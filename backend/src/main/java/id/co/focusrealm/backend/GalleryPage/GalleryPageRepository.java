@@ -15,7 +15,7 @@ import java.util.ArrayList;
 public class GalleryPageRepository {
 
     @Autowired
-    JdbcTemplate jdbcTemplate;
+    private JdbcTemplate jdbcTemplate;
 
     public ArrayList<UnobtainedCharacterModel> getUnobtainedCharacter(String user_id) {
 
@@ -140,20 +140,6 @@ public class GalleryPageRepository {
         }
 
         return obtainedScenery;
-    }
-
-    public void fetchGalleryPageByUserId(GalleryPageModel galleryPageModel){
-        try {
-
-            galleryPageModel.setUnobtainedScenery(getUnobtainedScenery(galleryPageModel.getUser_id()));
-            galleryPageModel.setObtainedScenery(getObtainedScenery(galleryPageModel.getUser_id()));
-            galleryPageModel.setUnobtainedCharacter(getUnobtainedCharacter(galleryPageModel.getUser_id()));
-            galleryPageModel.setObtainedCharacter(getObtainedCharacter(galleryPageModel.getUser_id()));
-
-        } catch (Exception e) {
-            log.error("Error at GalleryPageRepository fetchGalleryPageByUserId", e);
-            throw new RuntimeException(e);
-        }
     }
 
 }
