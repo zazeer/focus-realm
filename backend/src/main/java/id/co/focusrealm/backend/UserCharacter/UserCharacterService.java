@@ -14,7 +14,7 @@ public class UserCharacterService {
     private UserCharacterRepository userCharacterRepository;
 
     @Autowired
-    JdbcTemplate jdbcTemplate;
+    private JdbcTemplate jdbcTemplate;
 
     public String insertUserCharacter(UserCharacterModel userCharacterModel){
 

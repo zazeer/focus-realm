@@ -12,7 +12,7 @@ import java.util.Date;
 public class LogRepository {
 
     @Autowired
-    JdbcTemplate jdbcTemplate;
+    private JdbcTemplate jdbcTemplate;
 
     public void insertLog(LogModel logModel){
 

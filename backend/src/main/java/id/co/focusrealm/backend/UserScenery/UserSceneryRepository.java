@@ -11,7 +11,7 @@ import org.springframework.stereotype.Repository;
 public class UserSceneryRepository {
 
     @Autowired
-    JdbcTemplate jdbcTemplate;
+    private JdbcTemplate jdbcTemplate;
 
     public void insertUserScenery(UserSceneryModel userSceneryModel){
 

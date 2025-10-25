@@ -10,7 +10,7 @@ import org.springframework.stereotype.Repository;
 public class UserCharacterRepository {
 
     @Autowired
-    JdbcTemplate jdbcTemplate;
+    private JdbcTemplate jdbcTemplate;
 
     public void insertUserCharacter(UserCharacterModel userCharacterModel){
 

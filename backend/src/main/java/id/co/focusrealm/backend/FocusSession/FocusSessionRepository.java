@@ -15,7 +15,7 @@ import java.util.ArrayList;
 public class FocusSessionRepository {
 
     @Autowired
-    JdbcTemplate jdbcTemplate;
+    private JdbcTemplate jdbcTemplate;
 
     public void insertFocusSession(FocusSessionModel focusSessionModel){
 

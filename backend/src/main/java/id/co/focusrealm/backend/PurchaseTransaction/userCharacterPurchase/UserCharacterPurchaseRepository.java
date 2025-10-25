@@ -11,7 +11,7 @@ import org.springframework.stereotype.Repository;
 public class UserCharacterPurchaseRepository {
 
     @Autowired
-    JdbcTemplate jdbcTemplate;
+    private JdbcTemplate jdbcTemplate;
 
     public void insertUserCharacterPurchase(UserCharacterPurchaseModel userCharacterPurchaseModel){
 
