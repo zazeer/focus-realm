@@ -1,6 +1,5 @@
 import 'dart:developer' as developer;
 import 'package:flutter/material.dart';
-import 'package:rive/rive.dart' as rive;
 import '../models/gallery_models.dart';
 
 /// Widget untuk menampilkan preview hero area
@@ -19,8 +18,8 @@ class HeroPreviewWidget extends StatefulWidget {
 }
 
 class _HeroPreviewWidgetState extends State<HeroPreviewWidget> {
-  bool _isRiveLoaded = false;
-  String? _riveError;
+  bool _isImageLoaded = false;
+  String? _imageError;
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +27,6 @@ class _HeroPreviewWidgetState extends State<HeroPreviewWidget> {
       padding: const EdgeInsets.all(16),
       child: Column(
         children: [
-          // Rive Animation Area
           Expanded(
             flex: 3,
             child: Container(
@@ -43,7 +41,7 @@ class _HeroPreviewWidgetState extends State<HeroPreviewWidget> {
               ),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(9),
-                child: _buildRiveAnimation(),
+                child: _buildImageAnimation(),
               ),
             ),
           ),
@@ -60,47 +58,48 @@ class _HeroPreviewWidgetState extends State<HeroPreviewWidget> {
     );
   }
 
-  Widget _buildRiveAnimation() {
+  Widget _buildImageAnimation() {
     final assetPath = widget.isCharacter
         ? 'assets/character/${widget.item.fileName}'
         : 'assets/scenery/${widget.item.fileName}';
 
     return Stack(
-      children: [
-        // Rive Animation
-        if (_riveError == null)
-          Builder(
-            builder: (context) {
-              try {
-                return rive.RiveAnimation.asset(
-                  assetPath,
-                  fit: BoxFit.contain,
-                  onInit: (artboard) {
+    children: [
+      if (_imageError == null)
+        Image.asset(  
+          assetPath,
+          fit: BoxFit.contain,
+          frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
+            if (wasSynchronouslyLoaded || frame != null) {
+              // Image loaded
+              if (!_isImageLoaded) {
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  if (mounted) {
                     setState(() {
-                      _isRiveLoaded = true;
+                      _isImageLoaded = true;
                     });
-                    developer.log(
-                      'Rive animation loaded: ${widget.item.fileName}',
-                      name: 'HeroPreviewWidget._buildRiveAnimation',
-                    );
-                  },
-                );
-              } catch (error) {
-                setState(() {
-                  _riveError = error.toString();
+                  }
                 });
-                developer.log(
-                  'Rive animation error: $error',
-                  name: 'HeroPreviewWidget._buildRiveAnimation',
-                  error: error,
-                );
-                return const SizedBox(); // fallback kosong
               }
-            },
-          ),
+              return child;
+            }
+            return const SizedBox();
+          },
+          errorBuilder: (context, error, stackTrace) {
+            developer.log('Image load error: $error');
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (mounted) {
+                setState(() {
+                  _imageError = error.toString();
+                });
+              }
+            });
+            return const SizedBox();
+          },
+        ),
 
         // Fallback/Loading State
-        if (!_isRiveLoaded || _riveError != null)
+        if (!_isImageLoaded || _imageError != null)
           Container(
             width: double.infinity,
             height: double.infinity,
@@ -124,7 +123,7 @@ class _HeroPreviewWidgetState extends State<HeroPreviewWidget> {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  _riveError != null ? 'Animation Error' : 'Loading...',
+                  _imageError != null ? 'Animation Error' : 'Loading...',
                   style: TextStyle(
                     color: Colors.grey[600],
                     fontSize: 14,
@@ -135,7 +134,7 @@ class _HeroPreviewWidgetState extends State<HeroPreviewWidget> {
           ),
 
         // Loading overlay
-        if (!_isRiveLoaded && _riveError == null)
+        if (!_isImageLoaded && _imageError == null)
           const Center(
             child: CircularProgressIndicator(),
           ),
@@ -230,12 +229,12 @@ class GalleryItemCard extends StatelessWidget {
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: isSelected ? const Color(0xFF0B1957) : const Color(0xFF343F73),
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: isSelected
-                ? Theme.of(context).primaryColor
-                : Colors.grey[300]!,
+                ? const Color(0xFFF9FBFF)
+                : const Color(0xFF343F73),
             width: isSelected ? 3 : 1,
           ),
           boxShadow: [
@@ -248,7 +247,6 @@ class GalleryItemCard extends StatelessWidget {
         ),
         child: Column(
           children: [
-            // Animation Area
             Expanded(
               flex: 3,
               child: Container(
@@ -272,16 +270,16 @@ class GalleryItemCard extends StatelessWidget {
             Expanded(
               flex: 1,
               child: Padding(
-                padding: const EdgeInsets.all(8),
+                padding: const EdgeInsets.all(4),
                 child: Column(
                   children: [
                     // Item Name
                     Text(
                       item.name,
                       style: const TextStyle(
-                        fontSize: 14,
+                        fontSize: 12,
                         fontWeight: FontWeight.bold,
-                        color: Colors.black87,
+                        color: Color(0xFFF9FBFF),
                       ),
                       textAlign: TextAlign.center,
                       maxLines: 1,
@@ -289,9 +287,6 @@ class GalleryItemCard extends StatelessWidget {
                     ),
                     
                     const SizedBox(height: 4),
-                    
-                    // Rarity or Status
-                    _buildStatusIndicator(),
                   ],
                 ),
               ),
@@ -308,23 +303,28 @@ class GalleryItemCard extends StatelessWidget {
         : 'assets/scenery/${item.fileName}';
 
     return Stack(
+      alignment: Alignment.center,
       children: [
-        // Rive Animation
-        Builder(
-          builder: (context) {
-            try {
-              return rive.RiveAnimation.asset(
-                assetPath,
-                fit: BoxFit.cover,
-              );
-            } catch (error) {
-              developer.log(
-                'Rive animation error in card: $error',
-                name: 'GalleryItemCard._buildItemAnimation',
-                error: error,
-              );
-              return const SizedBox(); // fallback kosong
-            }
+        Image.asset(
+          assetPath,
+          fit: BoxFit.cover,
+          width: double.infinity,
+          height: double.infinity,
+          errorBuilder: (context, error, stackTrace) {
+            developer.log(
+              'Image load error in card: $error',
+              name: 'GalleryItemCard._buildItemAnimation',
+              error: error,
+            );
+            // Error fallback
+            return Container(
+              color: Colors.grey[300],
+              child: Icon(
+                isCharacter ? Icons.person : Icons.landscape,
+                size: 48,
+                color: Colors.grey[600],
+              ),
+            );
           },
         ),
 
@@ -358,7 +358,6 @@ class GalleryItemCard extends StatelessWidget {
             ),
           ),
 
-        // Selection indicator
         if (isSelected && item.isObtained)
           Builder(  
             builder: (context) => Positioned(  
@@ -389,42 +388,6 @@ class GalleryItemCard extends StatelessWidget {
     );
   }
 
-  Widget _buildStatusIndicator() {
-    if (!item.isObtained) {
-      return Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-        decoration: BoxDecoration(
-          color: Colors.red[100],
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Text(
-          '${item.price} coins',
-          style: TextStyle(
-            fontSize: 10,
-            color: Colors.red[700],
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-      );
-    } else {
-      return Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-        decoration: BoxDecoration(
-          color: _parseColor(item.rarityColor).withOpacity(0.2),
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Text(
-          item.rarity,
-          style: TextStyle(
-            fontSize: 10,
-            color: _parseColor(item.rarityColor),
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      );
-    }
-  }
-
   Color _parseColor(String hexColor) {
     try {
       return Color(int.parse(hexColor.replaceFirst('#', '0xFF')));
@@ -449,7 +412,7 @@ class GalleryLoadingWidget extends StatelessWidget {
         crossAxisSpacing: 16,
         mainAxisSpacing: 16,
       ),
-      itemCount: 6, // Show 6 shimmer cards
+      itemCount: 6,
       itemBuilder: (context, index) {
         return _buildShimmerCard();
       },

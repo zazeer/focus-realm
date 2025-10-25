@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:logger/logger.dart';
 
-// Model untuk User
 class UserModel {
   final String? user_Id;
   final String? music_Id;
@@ -111,7 +110,7 @@ class HomePageModel {
   }
 }
 
-// Model untuk Response
+// Response model
 class UserResponse {
   final String? errorCode;
   final String? errorMessage;
@@ -132,18 +131,14 @@ class UserResponse {
   }
 }
 
-// Service untuk API calls
 class UserApiService {
   static final logger = Logger();
-  // Ganti dengan URL backend kamu
   static const String baseUrl = 'http://localhost:8080'; 
   
-  // Headers untuk request
   static const Map<String, String> headers = {
     'Content-Type': 'application/json',
   };
 
-  // Fungsi untuk Register
   static Future<UserResponse> registerUser(UserModel user) async {
     try {
       final response = await http.post(
@@ -169,7 +164,7 @@ class UserApiService {
     }
   }
 
-  // Fungsi untuk Login
+  // Login user
   static Future<UserResponse> loginUser(UserModel user) async {
     try {
       final response = await http.post(
@@ -214,9 +209,4 @@ class UserApiService {
       return null;
     }
   }
-
-
-
-
-
 }

@@ -1,14 +1,11 @@
 import 'dart:developer' as developer;
 import 'package:flutter/material.dart';
-import 'package:rive/rive.dart'as rive;
 import '../models/gallery_models.dart';
 import '../services/gallery_service.dart';
 import '../widgets/gallery_widgets.dart';
 
-/// Enum untuk gallery tab
 enum GalleryTab { character, scenery }
 
-/// Gallery Page - Main presentation layer
 class GalleryPage extends StatefulWidget {
   final String userId;
   final GalleryService? galleryService;
@@ -24,13 +21,11 @@ class GalleryPage extends StatefulWidget {
 }
 
 class _GalleryPageState extends State<GalleryPage>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   
-  // Services and Controllers
   late final GalleryService _galleryService;
   late final TabController _tabController;
   
-  // State variables
   GalleryPageModel? _galleryData;
   bool _isLoading = true;
   String? _errorMessage;
@@ -38,7 +33,6 @@ class _GalleryPageState extends State<GalleryPage>
   String? _selectedCharacterId;
   String? _selectedSceneryId;
   
-  // Animation controllers for smooth transitions
   late final AnimationController _fadeController;
   late final Animation<double> _fadeAnimation;
 
@@ -83,7 +77,7 @@ class _GalleryPageState extends State<GalleryPage>
         _errorMessage = null;
       });
 
-      // Untuk demo, gunakan mock data. Ganti dengan fetchGalleryData untuk production
+      // For demo purposes, using mock data fetch
       final galleryData = await _galleryService.fetchGalleryDataMock(widget.userId);
       // final galleryData = await _galleryService.fetchGalleryData(widget.userId);
       
@@ -111,7 +105,6 @@ class _GalleryPageState extends State<GalleryPage>
 
   Future<void> _selectCharacter(Character character) async {
     if (!character.isObtained) {
-      _showLockedItemDialog(character);
       return;
     }
 
@@ -121,19 +114,6 @@ class _GalleryPageState extends State<GalleryPage>
       setState(() {
         _selectedCharacterId = character.id;
       });
-
-      // Update selection on server (uncomment for production)
-      // final success = await _galleryService.updateCharacterSelection(
-      //   userId: widget.userId,
-      //   characterId: character.id,
-      // );
-      // 
-      // if (!success) {
-      //   setState(() {
-      //     _selectedCharacterId = _galleryData?.chosenCharacter?.id;
-      //   });
-      //   _showErrorSnackBar('Failed to update character selection');
-      // }
       
     } catch (e) {
       developer.log('Error selecting character: $e', name: 'GalleryPage._selectCharacter', error: e);
@@ -146,7 +126,6 @@ class _GalleryPageState extends State<GalleryPage>
 
   Future<void> _selectScenery(Scenery scenery) async {
     if (!scenery.isObtained) {
-      _showLockedItemDialog(scenery);
       return;
     }
 
@@ -156,19 +135,6 @@ class _GalleryPageState extends State<GalleryPage>
       setState(() {
         _selectedSceneryId = scenery.id;
       });
-
-      // Update selection on server (uncomment for production)
-      // final success = await _galleryService.updateScenerySelection(
-      //   userId: widget.userId,
-      //   sceneryId: scenery.id,
-      // );
-      // 
-      // if (!success) {
-      //   setState(() {
-      //     _selectedSceneryId = _galleryData?.chosenScenery?.id;
-      //   });
-      //   _showErrorSnackBar('Failed to update scenery selection');
-      // }
       
     } catch (e) {
       developer.log('Error selecting scenery: $e', name: 'GalleryPage._selectScenery', error: e);
@@ -177,31 +143,6 @@ class _GalleryPageState extends State<GalleryPage>
       });
       _showErrorSnackBar('Failed to select scenery');
     }
-  }
-
-  void _showLockedItemDialog(GalleryItem item) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text('${item is Character ? 'Character' : 'Scenery'} Locked'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('${item.name} is not yet available.'),
-            const SizedBox(height: 8),
-            Text('Price: ${item.price} coins'),
-            Text('Release Date: ${item.releaseDate}'),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('OK'),
-          ),
-        ],
-      ),
-    );
   }
 
   void _showErrorSnackBar(String message) {
@@ -217,7 +158,6 @@ class _GalleryPageState extends State<GalleryPage>
   }
 
   Widget _buildPreviewArea() {
-    // Always show both character and scenery in preview (combined scene)
     final selectedCharacter = _galleryData?.allCharacters.firstWhere(
       (char) => char.id == _selectedCharacterId,
       orElse: () => _galleryData!.chosenCharacter ?? _galleryData!.allCharacters.first,
@@ -249,17 +189,19 @@ class _GalleryPageState extends State<GalleryPage>
             // Scenery background
             if (selectedScenery != null)
               Positioned.fill(
-                child: Builder(
-                  builder: (context) {
-                    try {
-                      return rive.RiveAnimation.asset(
-                        'assets/scenery/${selectedScenery.fileName}',
-                        fit: BoxFit.cover,
-                      );
-                    } catch (e) {
-                      developer.log('Scenery animation error: $e');
-                      return const SizedBox(); 
-                    }
+                child: Image.asset(  
+                  'assets/scenery/${selectedScenery.fileName}',
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) {
+                    developer.log('Scenery image error: $error');
+                    return Container(
+                      color: Colors.grey[300],
+                      child: const Icon(
+                        Icons.landscape,
+                        size: 64,
+                        color: Colors.grey,
+                      ),
+                    );
                   },
                 ),
               ),
@@ -271,20 +213,19 @@ class _GalleryPageState extends State<GalleryPage>
                 left: 0,
                 right: 0,
                 child: Center(
-                  child: Container(
+                  child: SizedBox(  
                     width: 120,
                     height: 120,
-                    child: Builder(
-                      builder: (context) {
-                        try {
-                          return rive.RiveAnimation.asset(
-                            'assets/character/${selectedCharacter.fileName}',
-                            fit: BoxFit.contain,
-                          );
-                        } catch (e) {
-                          developer.log('Character animation error: $e');
-                          return const SizedBox(); // fallback kosong
-                        }
+                    child: Image.asset(
+                      'assets/character/${selectedCharacter.fileName}',
+                      fit: BoxFit.contain,
+                      errorBuilder: (context, error, stackTrace) {
+                        developer.log('Character image error: $error');
+                        return const Icon(
+                          Icons.person,
+                          size: 64,
+                          color: Colors.grey,
+                        );
                       },
                     ),
                   ),
@@ -299,8 +240,8 @@ class _GalleryPageState extends State<GalleryPage>
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
                     colors: [
-                      Colors.blue[300]!,
-                      Colors.blue[600]!,
+                      const Color(0xFF2E77C3),
+                      const Color(0xFF2E77C3),
                     ],
                   ),
                 ),
@@ -328,34 +269,58 @@ class _GalleryPageState extends State<GalleryPage>
     );
   }
 
-  Widget _buildTabBar() {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 40),
-      decoration: BoxDecoration(
-        color: Colors.grey[200],
-        borderRadius: BorderRadius.circular(25),
-      ),
-      child: TabBar(
-        controller: _tabController,
-        indicator: BoxDecoration(
-          color: Colors.blue[600],
-          borderRadius: BorderRadius.circular(25),
-        ),
-        indicatorSize: TabBarIndicatorSize.tab,
-        dividerColor: Colors.transparent,
-        labelColor: Colors.white,
-        unselectedLabelColor: Colors.grey[600],
-        labelStyle: const TextStyle(
-          fontWeight: FontWeight.bold,
-          fontSize: 16,
-        ),
-        unselectedLabelStyle: const TextStyle(
-          fontWeight: FontWeight.w500,
-          fontSize: 16,
-        ),
-        tabs: const [
-          Tab(text: 'Character'),
-          Tab(text: 'Scenery'),
+  Widget _buildTabButtons() {
+    final Color activeColor = const Color(0xFF2E77C3);
+    final Color inactiveColor = const Color(0xFFB0BEC5);
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 40),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Expanded(
+            child: ElevatedButton(
+              onPressed: () {
+                _tabController.animateTo(0);
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: _currentTab == GalleryTab.character
+                    ? activeColor
+                    : inactiveColor,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                padding: const EdgeInsets.symmetric(vertical: 12),
+              ),
+              child: const Text(
+                'Character',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              ),
+            ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: ElevatedButton(
+              onPressed: () {
+                _tabController.animateTo(1);
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: _currentTab == GalleryTab.scenery
+                    ? activeColor
+                    : inactiveColor,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                padding: const EdgeInsets.symmetric(vertical: 12),
+              ),
+              child: const Text(
+                'Scenery',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              ),
+            ),
+          ),
         ],
       ),
     );
@@ -372,7 +337,7 @@ class _GalleryPageState extends State<GalleryPage>
 
     return Container(
       decoration: BoxDecoration(
-        color: Colors.blue[600],
+        color: const Color(0xFF2E77C3),
         borderRadius: const BorderRadius.only(
           topLeft: Radius.circular(30),
           topRight: Radius.circular(30),
@@ -464,52 +429,29 @@ class _GalleryPageState extends State<GalleryPage>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'Gallery',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 24,
-          ),
-        ),
-        centerTitle: true,
-        backgroundColor: Theme.of(context).primaryColor,
-        foregroundColor: Colors.white,
-        elevation: 0,
-        actions: [
-          IconButton(
-            onPressed: _loadGalleryData,
-            icon: const Icon(Icons.refresh),
-            tooltip: 'Refresh Gallery',
-          ),
-        ],
-      ),
       body: _isLoading
-          ? _buildLoadingState()
-          : _errorMessage != null
-              ? _buildErrorState()
-              : FadeTransition(
-                  opacity: _fadeAnimation,
-                  child: Column(
-                    children: [
-                      // Hero Preview Area
-                      Padding(
-                        padding: const EdgeInsets.only(top: 20, bottom: 24),
-                        child: _buildPreviewArea(),
-                      ),
-                      
-                      // Tab Bar
-                      _buildTabBar(),
-                      
-                      const SizedBox(height: 20),
-                      
-                      // Gallery Grid
-                      Expanded(
-                        child: _buildGalleryGrid(),
-                      ),
-                    ],
-                  ),
+        ? _buildLoadingState()
+        : _errorMessage != null
+            ? _buildErrorState()
+            : FadeTransition(
+                opacity: _fadeAnimation,
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(top: 20, bottom: 24),
+                      child: _buildPreviewArea(),
+                    ),
+                    
+                    _buildTabButtons(),
+                    
+                    const SizedBox(height: 20),
+                    
+                    Expanded(
+                      child: _buildGalleryGrid(),
+                    ),
+                  ],
                 ),
+              ),
     );
   }
 

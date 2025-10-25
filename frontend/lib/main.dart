@@ -24,7 +24,7 @@ class MyApp extends StatelessWidget {
         visualDensity: VisualDensity.adaptivePlatformDensity,
         fontFamily: 'Poppins',
       ),
-      home: const GalleryPage(userId: '1'),
+      home: const LoginPage(),
       debugShowCheckedModeBanner: false,
     );
   }

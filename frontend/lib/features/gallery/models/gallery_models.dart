@@ -1,6 +1,6 @@
 import 'dart:developer' as developer;
 
-/// Base class untuk semua gallery items
+/// Base class
 abstract class GalleryItem {
   final String id;
   final String name;
@@ -46,7 +46,7 @@ abstract class GalleryItem {
   }
 }
 
-/// Model untuk Character
+/// Character Model
 class Character extends GalleryItem {
   final bool chosenCharacter;
 
@@ -133,7 +133,7 @@ class Character extends GalleryItem {
   }
 }
 
-/// Model untuk Scenery
+/// Scenery Model
 class Scenery extends GalleryItem {
   final bool chosenScenery;
 
@@ -155,7 +155,7 @@ class Scenery extends GalleryItem {
       
       return Scenery(
         id: json['scenery_id']?.toString() ?? '',
-        name: json['scenery_name']?.toString() ?? 'Unknown Scenery',
+        name: json['scenery_name']?.toString() ?? 'Unknown',
         rarity: json['scenery_rarity']?.toString() ?? 'Common',
         description: json['scenery_description']?.toString() ?? '',
         price: int.tryParse(json['price']?.toString() ?? '0') ?? 0,
@@ -286,13 +286,10 @@ class GalleryPageModel {
     }).where((scenery) => scenery != null).cast<Scenery>().toList();
   }
 
-  /// Get all characters (obtained and unobtained)
   List<Character> get allCharacters => [...obtainedCharacters, ...unobtainedCharacters];
   
-  /// Get all sceneries (obtained and unobtained)
   List<Scenery> get allSceneries => [...obtainedSceneries, ...unobtainedSceneries];
   
-  /// Get currently chosen character
   Character? get chosenCharacter {
     try {
       return obtainedCharacters.firstWhere((char) => char.chosenCharacter);
@@ -302,7 +299,6 @@ class GalleryPageModel {
     }
   }
   
-  /// Get currently chosen scenery
   Scenery? get chosenScenery {
     try {
       return obtainedSceneries.firstWhere((scenery) => scenery.chosenScenery);
@@ -310,23 +306,6 @@ class GalleryPageModel {
       developer.log('No chosen scenery found', name: 'GalleryPageModel.chosenScenery');
       return obtainedSceneries.isNotEmpty ? obtainedSceneries.first : null;
     }
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'galleryPageModel': {
-        'user_id': userId,
-        'unobtainedCharacter': unobtainedCharacters.map((c) => c.toJson()).toList(),
-        'unobtainedScenery': unobtainedSceneries.map((s) => s.toJson()).toList(),
-        'obtainedCharacter': obtainedCharacters.map((c) => c.toJson()).toList(),
-        'obtainedScenery': obtainedSceneries.map((s) => s.toJson()).toList(),
-      }
-    };
-  }
-
-  @override
-  String toString() {
-    return 'GalleryPageModel{userId: $userId, obtainedCharacters: ${obtainedCharacters.length}, obtainedSceneries: ${obtainedSceneries.length}, unobtainedCharacters: ${unobtainedCharacters.length}, unobtainedSceneries: ${unobtainedSceneries.length}}';
   }
 }
 
@@ -365,14 +344,6 @@ class GalleryApiResponse {
   }
 
   bool get isSuccess => errorCode == '200';
-  
-  Map<String, dynamic> toJson() {
-    return {
-      'errorCode': errorCode,
-      'errorMessage': errorMessage,
-      if (galleryPageModel != null) ...galleryPageModel!.toJson(),
-    };
-  }
 
   @override
   String toString() {
