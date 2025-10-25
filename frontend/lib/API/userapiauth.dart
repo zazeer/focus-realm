@@ -111,6 +111,21 @@ class HomePageModel {
   }
 }
 
+class CustomizationPageModel {
+  final String userId;
+
+  CustomizationPageModel({
+    required this.userId,
+  });
+
+  factory CustomizationPageModel.fromJson(Map<String, dynamic> json) {
+    return CustomizationPageModel(
+      userId: json['user_id'] ?? '',
+    );
+  }
+
+}
+
 // Model untuk Response
 class UserResponse {
   final String? errorCode;
@@ -220,6 +235,33 @@ class UserApiService {
       return null;
     } catch (e) {
       print('Error fetching home page data: $e');
+      return null;
+    }
+  }
+
+  static Future<CustomizationPageModel?> fetchCustomizationPageData(String userId) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/customization_page/fetch_customization_page_by_user_id'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'user_id': userId}),
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        logger.i('Customization page data: $data');
+        
+        // Cek apakah response sukses
+        if (data['errorCode'] == '200' && data['customizationPageModel'] != null) {
+          // Ambil data dari customizationPageModel
+          return CustomizationPageModel(
+            userId: data['customizationPageModel']['user_id'] ?? '',
+          );
+        }
+      }
+      return null;
+    } catch (e) {
+      print('Error fetching customization page data: $e');
       return null;
     }
   }

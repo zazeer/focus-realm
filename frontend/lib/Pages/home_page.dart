@@ -1,11 +1,14 @@
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/API/userapiauth.dart';
+import 'package:frontend/Pages/profile_page.dart'; // Tambahkan import ini
+import 'package:frontend/Pages/custom_time.dart';
 
 class HomePage extends StatefulWidget {
   final String userId;
+  final Map<String, dynamic>? timerSettings;
   
-  const HomePage({Key? key, required this.userId}) : super(key: key);
+  const HomePage({Key? key, required this.userId, this.timerSettings}) : super(key: key);
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -17,6 +20,8 @@ class _HomePageState extends State<HomePage> {
   
   String selectedTimer = 'Pomodoro long';
   int selectedMinutes = 25;
+  int breakMinutes = 5;
+  int sessionCount = 2;
   bool isTimerRunning = false;
   
   final List<String> timerTypes = ['Pomodoro long', 'Pomodoro short', 'Custom'];
@@ -26,6 +31,18 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     _loadHomePageData();
+    _loadTimerSettings();
+  }
+
+  void _loadTimerSettings() {
+    if (widget.timerSettings != null) {
+      setState(() {
+        selectedTimer = widget.timerSettings!['timerType'] ?? 'Pomodoro long';
+        selectedMinutes = widget.timerSettings!['studyMinutes'] ?? 25;
+        breakMinutes = widget.timerSettings!['breakMinutes'] ?? 5;
+        sessionCount = widget.timerSettings!['sessionCount'] ?? 2;
+      });
+    }
   }
 
   Future<void> _loadHomePageData() async {
@@ -54,7 +71,7 @@ class _HomePageState extends State<HomePage> {
             // Header dengan background gradient dan game scene
             Container(
               width: double.infinity,
-              height: MediaQuery.of(context).size.height * 0.6,
+              height: MediaQuery.of(context).size.height * 0.5,
               decoration: const BoxDecoration(
                 gradient: LinearGradient(
                   colors: [Color(0xFF4C9EEB), Color(0xFF446AD4), Color(0xFF7A4AFE)],
@@ -139,11 +156,11 @@ class _HomePageState extends State<HomePage> {
                   
                   // Game Scene Container
                   Positioned(
-                    bottom: 20,
+                    bottom: 15,
                     left: 20,
                     right: 20,
                     child: Container(
-                      height: 200,
+                      height: 180,
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
                         color: const Color(0xFF87CEEB), // Sky blue background
@@ -157,7 +174,7 @@ class _HomePageState extends State<HomePage> {
                           
                           // Character placeholder
                           Positioned(
-                            bottom: 30,
+                            bottom: 20,
                             left: MediaQuery.of(context).size.width * 0.4,
                             child: _buildCharacterPlaceholder(),
                           ),
@@ -206,87 +223,50 @@ class _HomePageState extends State<HomePage> {
                         color: const Color(0xFF4C9EEB),
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      child: Row(
+                      child: Column(
                         children: [
                           // Timer type dropdown
-                          Expanded(
-                            flex: 2,
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: DropdownButton<String>(
-                                value: selectedTimer,
-                                underline: const SizedBox(),
-                                isExpanded: true,
-                                items: timerTypes.map((String value) {
-                                  return DropdownMenuItem<String>(
-                                    value: value,
-                                    child: Text(value, style: const TextStyle(fontSize: 12)),
-                                  );
-                                }).toList(),
-                                onChanged: (String? newValue) {
-                                  if (newValue != null) {
-                                    setState(() {
-                                      selectedTimer = newValue;
-                                    });
-                                  }
-                                },
-                              ),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: DropdownButton<String>(
+                              value: selectedTimer,
+                              underline: const SizedBox(),
+                              isExpanded: true,
+                              items: timerTypes.map((String value) {
+                                return DropdownMenuItem<String>(
+                                  value: value,
+                                  child: Text(value, style: const TextStyle(fontSize: 12)),
+                                );
+                              }).toList(),
+                              onChanged: null, // Disabled, hanya bisa diubah dari CustomizationPage
                             ),
                           ),
-                          const SizedBox(width: 12),
-                          
-                          // Time options
-                          ...minuteOptions.map((minutes) => Padding(
-                            padding: const EdgeInsets.only(right: 8),
-                            child: GestureDetector(
-                              onTap: () {
-                                setState(() {
-                                  selectedMinutes = minutes;
-                                });
-                              },
-                              child: Container(
-                                width: 50,
-                                padding: const EdgeInsets.all(8),
-                                decoration: BoxDecoration(
-                                  color: selectedMinutes == minutes 
-                                      ? Colors.orange 
-                                      : Colors.white,
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: Column(
-                                  children: [
-                                    Icon(
-                                      minutes == 25 ? Icons.schedule : 
-                                      minutes == 5 ? Icons.timer : Icons.access_time,
-                                      size: 16,
-                                      color: selectedMinutes == minutes 
-                                          ? Colors.white 
-                                          : Colors.grey,
-                                    ),
-                                    Text(
-                                      '${minutes}m',
-                                      style: TextStyle(
-                                        fontSize: 10,
-                                        color: selectedMinutes == minutes 
-                                            ? Colors.white 
-                                            : Colors.grey,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
+                          const SizedBox(height: 10),
+                          // Display timer details
+                          Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.2),
+                              borderRadius: BorderRadius.circular(8),
                             ),
-                          )).toList(),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              children: [
+                                _buildTimerDetail('Study', '$selectedMinutes min'),
+                                _buildTimerDetail('Break', '$breakMinutes min'),
+                                _buildTimerDetail('Sessions', '$sessionCount'),
+                              ],
+                            ),
+                          ),
                         ],
                       ),
                     ),
                     
                     const SizedBox(height: 20),
-                    
                     // Start Timer Button
                     Row(
                       children: [
@@ -314,18 +294,29 @@ class _HomePageState extends State<HomePage> {
                             ),
                           ),
                         ),
+
                         const SizedBox(width: 12),
-                        Container(
-                          width: 50,
-                          height: 50,
-                          decoration: BoxDecoration(
-                            color: Colors.black,
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: const Icon(
-                            Icons.settings,
-                            color: Color(0xFFF9FBFF),
-                            size: 24,
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => CustomizationPage(userId: widget.userId),
+                              ),
+                            );
+                          },
+                          child: Container(
+                            width: 50,
+                            height: 50,
+                            decoration: BoxDecoration(
+                              color: Colors.black,
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: const Icon(
+                              Icons.settings,
+                              color: Color(0xFFF9FBFF),
+                              size: 24,
+                            ),
                           ),
                         ),
                       ],
@@ -366,9 +357,31 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  Widget _buildTimerDetail(String label, String value) {
+    return Column(
+      children: [
+        Text(
+          label,
+          style: const TextStyle(
+            color: Colors.white70,
+            fontSize: 10,
+          ),
+        ),
+        Text(
+          value,
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 14,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget _buildSceneryPlaceholder() {
     bool hasScenery = homePageData?.sceneryFileName != null && 
-                      homePageData!.sceneryFileName!.isNotEmpty;
+                      homePageData!.sceneryFileName.isNotEmpty;
     
     return Container(
       width: double.infinity,
@@ -393,7 +406,7 @@ class _HomePageState extends State<HomePage> {
             const SizedBox(height: 8),
             Text(
               hasScenery 
-                  ? homePageData!.sceneryName ?? 'Scenery' 
+                  ? (homePageData!.sceneryName.isNotEmpty ? homePageData!.sceneryName : 'Scenery')
                   : 'No Scenery',
               style: TextStyle(
                 color: hasScenery ? Colors.green[800] : Colors.grey[600],
@@ -403,7 +416,7 @@ class _HomePageState extends State<HomePage> {
             ),
             if (hasScenery)
               Text(
-                homePageData!.sceneryFileName!,
+                homePageData!.sceneryFileName,
                 style: TextStyle(
                   color: Colors.green[600],
                   fontSize: 10,
@@ -417,7 +430,7 @@ class _HomePageState extends State<HomePage> {
 
   Widget _buildCharacterPlaceholder() {
     bool hasCharacter = homePageData?.characterFileName != null && 
-                        homePageData!.characterFileName!.isNotEmpty;
+                        homePageData!.characterFileName.isNotEmpty;
     
     return Container(
       width: 60,
@@ -441,7 +454,7 @@ class _HomePageState extends State<HomePage> {
           const SizedBox(height: 4),
           Text(
             hasCharacter 
-                ? homePageData!.characterName ?? 'Character' 
+                ? (homePageData!.characterName.isNotEmpty ? homePageData!.characterName : 'Character')
                 : 'No Char',
             style: TextStyle(
               color: hasCharacter ? Colors.green[800] : Colors.grey[600],
@@ -452,7 +465,7 @@ class _HomePageState extends State<HomePage> {
           ),
           if (hasCharacter)
             Text(
-              homePageData!.characterFileName!,
+              homePageData!.characterFileName,
               style: TextStyle(
                 color: Colors.green[600],
                 fontSize: 6,
@@ -464,28 +477,40 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildCloud() {
-    return Container(
-      width: 40,
-      height: 20,
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.8),
-        borderRadius: BorderRadius.circular(20),
-      ),
-    );
-  }
-
   Widget _buildNavItem(IconData icon, bool isSelected) {
-    return Container(
-      padding: const EdgeInsets.all(8),
-      decoration: BoxDecoration(
-        color: isSelected ? const Color(0xFF4C9EEB) : Colors.transparent,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Icon(
-        icon,
-        color: isSelected ? Color(0xFFF9FBFF) : Colors.grey,
-        size: 28,
+    return GestureDetector(
+      onTap: () {
+        // Navigasi berdasarkan icon yang ditekan
+        if (icon == Icons.person) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ProfilePage(userId: widget.userId),
+            ),
+          );
+        }
+        // Tambahkan navigasi lain jika diperlukan
+        // else if (icon == Icons.explore) {
+        //   // Navigate to explore page
+        // }
+        // else if (icon == Icons.shopping_bag) {
+        //   // Navigate to shop page
+        // }
+        // else if (icon == Icons.assessment) {
+        //   // Navigate to statistics page
+        // }
+      },
+      child: Container(
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: isSelected ? const Color(0xFF4C9EEB) : Colors.transparent,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Icon(
+          icon,
+          color: isSelected ? Color(0xFFF9FBFF) : Colors.grey,
+          size: 28,
+        ),
       ),
     );
   }
