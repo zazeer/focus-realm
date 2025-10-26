@@ -150,6 +150,158 @@ class ShopService {
     }
   }
 
+  /// Purchase a character
+  Future<void> purchaseCharacter({
+    required String userId,
+    required String characterId,
+    Map<String, String>? additionalHeaders,
+  }) async {
+    developer.log('Purchasing character: $characterId for user: $userId', name: 'ShopService.purchaseCharacter');
+    
+    final uri = Uri.parse('$baseUrl/purchase_character'); 
+    final headers = {..._defaultHeaders};
+    if (additionalHeaders != null) {
+      headers.addAll(additionalHeaders);
+    }
+    final body = json.encode({
+      'user_id': userId,
+      'character_id': characterId,
+    });
+
+    developer.log('Making POST request to: $uri with body: $body', name: 'ShopService.purchaseCharacter');
+
+    try {
+      final response = await _httpClient
+          .post(uri, headers: headers, body: body)
+          .timeout(timeout);
+
+      developer.log(
+        'Purchase Response - Status: ${response.statusCode}, Body: ${response.body}',
+        name: 'ShopService.purchaseCharacter',
+      );
+
+      if (response.statusCode == 200) {
+        await _parsePurchaseResponse(response.body);
+      } else {
+        throw ShopServiceException(
+          message: 'Failed to purchase character: ${response.statusCode}',
+          errorCode: response.statusCode.toString(),
+          originalError: response.body,
+        );
+      }
+    } on SocketException catch (e) {
+      developer.log('Network error: $e', name: 'ShopService.purchaseCharacter', error: e);
+      throw ShopServiceException(
+        message: 'Network error: Please check your internet connection',
+        originalError: e,
+      );
+    } on FormatException catch (e) {
+      developer.log('JSON parsing error: $e', name: 'ShopService.purchaseCharacter', error: e);
+      throw ShopServiceException(
+        message: 'Invalid response format from server',
+        originalError: e,
+      );
+    } catch (e) {
+      developer.log('Unexpected error: $e', name: 'ShopService.purchaseCharacter', error: e);
+      if (e is ShopServiceException) rethrow;
+      throw ShopServiceException(
+        message: 'Failed to purchase character: $e',
+        originalError: e,
+      );
+    }
+  }
+
+  /// Purchase a scenery
+  Future<void> purchaseScenery({
+    required String userId,
+    required String sceneryId,
+    Map<String, String>? additionalHeaders,
+  }) async {
+    developer.log('Purchasing scenery: $sceneryId for user: $userId', name: 'ShopService.purchaseScenery');
+    
+    final uri = Uri.parse('$baseUrl/purchase_scenery'); 
+    final headers = {..._defaultHeaders};
+    if (additionalHeaders != null) {
+      headers.addAll(additionalHeaders);
+    }
+    final body = json.encode({
+      'user_id': userId,
+      'scenery_id': sceneryId,
+    });
+
+    developer.log('Making POST request to: $uri with body: $body', name: 'ShopService.purchaseScenery');
+
+    try {
+      final response = await _httpClient
+          .post(uri, headers: headers, body: body)
+          .timeout(timeout);
+
+      developer.log(
+        'Purchase Response - Status: ${response.statusCode}, Body: ${response.body}',
+        name: 'ShopService.purchaseScenery',
+      );
+
+      if (response.statusCode == 200) {
+        await _parsePurchaseResponse(response.body);
+      } else {
+        throw ShopServiceException(
+          message: 'Failed to purchase scenery: ${response.statusCode}',
+          errorCode: response.statusCode.toString(),
+          originalError: response.body,
+        );
+      }
+    } on SocketException catch (e) {
+      developer.log('Network error: $e', name: 'ShopService.purchaseScenery', error: e);
+      throw ShopServiceException(
+        message: 'Network error: Please check your internet connection',
+        originalError: e,
+      );
+    } on FormatException catch (e) {
+      developer.log('JSON parsing error: $e', name: 'ShopService.purchaseScenery', error: e);
+      throw ShopServiceException(
+        message: 'Invalid response format from server',
+        originalError: e,
+      );
+    } catch (e) {
+      developer.log('Unexpected error: $e', name: 'ShopService.purchaseScenery', error: e);
+      if (e is ShopServiceException) rethrow;
+      throw ShopServiceException(
+        message: 'Failed to purchase scenery: $e',
+        originalError: e,
+      );
+    }
+  }
+
+  /// Purchase parse response
+  Future<void> _parsePurchaseResponse(String responseBody) async {
+    try {
+      developer.log('Parsing purchase response', name: 'ShopService._parsePurchaseResponse');
+      
+      final Map<String, dynamic> jsonData = json.decode(responseBody);
+      final errorCode = jsonData['errorCode']?.toString();
+      final errorMessage = jsonData['errorMessage']?.toString();
+
+      if (errorCode != '200') {
+        throw ShopServiceException(
+          message: errorMessage ?? 'Unknown purchase error',
+          errorCode: errorCode ?? '500',
+        );
+      }
+      developer.log('Purchase successful', name: 'ShopService._parsePurchaseResponse');
+    } catch (e) {
+      if (e is ShopServiceException) rethrow;
+      developer.log(
+        'Error parsing purchase response: $e',
+        name: 'ShopService._parsePurchaseResponse',
+        error: e,
+      );
+      throw ShopServiceException(
+        message: 'Failed to parse purchase response: $e',
+        originalError: e,
+      );
+    }
+  }
+
   /// Mock method untuk testing 
   Future<ShopPageModel> fetchShopDataMock(String userId) async {
     developer.log('Using mock data for user: $userId', name: 'ShopService.fetchShopDataMock');
@@ -296,6 +448,54 @@ class ShopService {
     ''';
 
     return await _parseShopResponse(mockResponse);
+  }
+
+  /// Mock purchase character untuk testing
+  Future<void> purchaseCharacterMock({
+    required String userId,
+    required String characterId,
+  }) async {
+    developer.log(
+      'Mock purchasing character: $characterId for user: $userId',
+      name: 'ShopService.purchaseCharacterMock',
+    );
+    
+    // Simulate network delay
+    await Future.delayed(Duration(milliseconds: 800));
+
+    // Simulate success response
+    const mockResponse = '''
+    {
+      "errorCode": "200",
+      "errorMessage": "Character purchased successfully"
+    }
+    ''';
+
+    await _parsePurchaseResponse(mockResponse);
+  }
+
+  /// Mock purchase scenery untuk testing
+  Future<void> purchaseSceneryMock({
+    required String userId,
+    required String sceneryId,
+  }) async {
+    developer.log(
+      'Mock purchasing scenery: $sceneryId for user: $userId',
+      name: 'ShopService.purchaseSceneryMock',
+    );
+    
+    // Simulate network delay
+    await Future.delayed(Duration(milliseconds: 800));
+
+    // Simulate success response
+    const mockResponse = '''
+    {
+      "errorCode": "200",
+      "errorMessage": "Scenery purchased successfully"
+    }
+    ''';
+
+    await _parsePurchaseResponse(mockResponse);
   }
 
   /// Dispose resources

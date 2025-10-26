@@ -30,8 +30,6 @@ class _ShopPageState extends State<ShopPage>
   bool _isLoading = true;
   String? _errorMessage;
   ShopTab _currentTab = ShopTab.character;
-  String? _selectedCharacterId;
-  String? _selectedSceneryId;
   
   late final AnimationController _fadeController;
   late final Animation<double> _fadeAnimation;
@@ -58,32 +56,44 @@ class _ShopPageState extends State<ShopPage>
   }
 
   void _showItemPreviewPopup(ShopItem item, bool isCharacter) {
+    bool isBuying = false; 
+
     showDialog(
       context: context,
-      builder: (BuildContext context) {
-        return Dialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          backgroundColor: const Color(0xFFECECEC), 
-          child: Container(
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              mainAxisSize: MainAxisSize.min, 
-              children: [
-                _buildPopupInfo(item, isCharacter),
-                
-                const SizedBox(height: 24),
-                
-                _buildPopupButtons(context, item),
-              ],
-            ),
-          ),
+      barrierDismissible: false, 
+      builder: (BuildContext dialogContext) {
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return Dialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              backgroundColor: const Color(0xFFECECEC),
+              child: Container(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    _buildPopupInfo(item, isCharacter),
+                    
+                    const SizedBox(height: 24),
+                    
+                    _buildPopupButtons(
+                      dialogContext, 
+                      item,
+                      isBuying,
+                      setDialogState, 
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
         );
       },
     );
   }
-
+  
   Widget _buildPopupInfo(ShopItem item, bool isCharacter) {
     final assetPath = isCharacter
         ? 'assets/character/${item.fileName}'
@@ -98,7 +108,6 @@ class _ShopPageState extends State<ShopPage>
           child: Image.asset(
             assetPath,
             fit: BoxFit.contain,
-            // Fallback jika gambar error
             errorBuilder: (context, error, stackTrace) {
               return Icon(
                 isCharacter ? Icons.person : Icons.landscape,
@@ -145,11 +154,18 @@ class _ShopPageState extends State<ShopPage>
     );
   }
 
-  Widget _buildPopupButtons(BuildContext context, ShopItem item) {
+  Widget _buildPopupButtons(
+    BuildContext dialogContext, 
+    ShopItem item,
+    bool isBuying, 
+    StateSetter setDialogState, 
+  ) {
     final buttonColor = const Color(0xFF4A5A9D);
     final buttonShape = RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(30),
     );
+
+    final bool isAlreadyObtained = item.isObtained;
 
     return Row(
       children: [
@@ -159,37 +175,102 @@ class _ShopPageState extends State<ShopPage>
               backgroundColor: buttonColor,
               shape: buttonShape,
               padding: const EdgeInsets.symmetric(vertical: 12),
+              disabledBackgroundColor: Colors.grey[400],
             ),
-            onPressed: () {
-              // TODO: Tambahkan logika pembelian
-              developer.log('Membeli item: ${item.name} seharga ${item.price}');
-              Navigator.of(context).pop(); 
-            },
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  Icons.monetization_on,
-                  color: Colors.yellow[600], 
-                  size: 24,
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  item.price.toString(),
-                  style: TextStyle(
-                    color: Colors.yellow[600],
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
-                  ),
-                ),
-              ],
-            ),
+            onPressed: (isBuying || isAlreadyObtained)
+                ? null
+                : () async {
+                    // 1. Set state loading
+                    setDialogState(() {
+                      isBuying = true;
+                    });
+
+                    try {
+                      // 2. Panggil API service
+                      if (item is Character) {
+                        // Untuk TESTING (Mock):
+                        await _shopService.purchaseCharacterMock(
+                          userId: widget.userId,
+                          characterId: item.id,
+                        );
+                        
+                        // Untuk PRODUCTION (Real API):
+                        // await _shopService.purchaseCharacter(
+                        //   userId: widget.userId,
+                        //   characterId: item.id,
+                        // );
+                        
+                      } else if (item is Scenery) {
+                        // Untuk TESTING (Mock):
+                        await _shopService.purchaseSceneryMock(
+                          userId: widget.userId,
+                          sceneryId: item.id,
+                        );
+                        
+                        // Untuk PRODUCTION (Real API):
+                        // await _shopService.purchaseScenery(
+                        //   userId: widget.userId,
+                        //   sceneryId: item.id,
+                        // );
+                      }
+
+                      // 3. Sukses
+                      Navigator.of(dialogContext).pop(); 
+                      _showSuccessSnackBar('${item.name} purchased!');
+                      _loadShopData(); 
+                    
+                    } catch (e) {
+                      // 4. Gagal
+                      Navigator.of(dialogContext).pop(); 
+                      _showErrorSnackBar(
+                        e is ShopServiceException
+                            ? e.message
+                            : 'Purchase failed. Please try again.',
+                      );
+                    }
+                  },
+            child: isBuying
+                ? const SizedBox( 
+                    height: 24,
+                    width: 24,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: Colors.white,
+                    ),
+                  )
+                : isAlreadyObtained
+                    ? const Text( 
+                        'Owned',
+                        style: TextStyle(
+                          color: Colors.black54,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
+                        ),
+                      )
+                    : Row( 
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.monetization_on,
+                            color: Colors.yellow[600],
+                            size: 24,
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            item.price.toString(),
+                            style: TextStyle(
+                              color: Colors.yellow[600],
+                              fontWeight: FontWeight.bold,
+                              fontSize: 18,
+                            ),
+                          ),
+                        ],
+                      ),
           ),
         ),
         
         const SizedBox(width: 16),
-        
-        // Kanan: Tombol Batal
+
         Expanded(
           child: ElevatedButton(
             style: ElevatedButton.styleFrom(
@@ -197,9 +278,11 @@ class _ShopPageState extends State<ShopPage>
               shape: buttonShape,
               padding: const EdgeInsets.symmetric(vertical: 12),
             ),
-            onPressed: () {
-              Navigator.of(context).pop(); 
-            },
+            onPressed: isBuying
+                ? null
+                : () {
+                    Navigator.of(dialogContext).pop(); 
+                  },
             child: const Text(
               'Cancel',
               style: TextStyle(
@@ -212,9 +295,7 @@ class _ShopPageState extends State<ShopPage>
         ),
       ],
     );
-  }
-
-  void _handleTabChange() {
+  }  void _handleTabChange() {
     if (_tabController.indexIsChanging) return;
     
     setState(() {
@@ -240,8 +321,6 @@ class _ShopPageState extends State<ShopPage>
       
       setState(() {
         _shopData = shopData;
-        _selectedCharacterId = shopData.chosenCharacter?.id;
-        _selectedSceneryId = shopData.chosenScenery?.id;
         _isLoading = false;
       });
 
@@ -260,48 +339,6 @@ class _ShopPageState extends State<ShopPage>
     }
   }
 
-  Future<void> _selectCharacter(Character character) async {
-    if (!character.isObtained) {
-      return;
-    }
-
-    try {
-      developer.log('Selecting character: ${character.name}', name: 'ShopPage._selectCharacter');
-      
-      setState(() {
-        _selectedCharacterId = character.id;
-      });
-      
-    } catch (e) {
-      developer.log('Error selecting character: $e', name: 'ShopPage._selectCharacter', error: e);
-      setState(() {
-        _selectedCharacterId = _shopData?.chosenCharacter?.id;
-      });
-      _showErrorSnackBar('Failed to select character');
-    }
-  }
-
-  Future<void> _selectScenery(Scenery scenery) async {
-    if (!scenery.isObtained) {
-      return;
-    }
-
-    try {
-      developer.log('Selecting scenery: ${scenery.name}', name: 'ShopPage._selectScenery');
-      
-      setState(() {
-        _selectedSceneryId = scenery.id;
-      });
-      
-    } catch (e) {
-      developer.log('Error selecting scenery: $e', name: 'ShopPage._selectScenery', error: e);
-      setState(() {
-        _selectedSceneryId = _shopData?.chosenScenery?.id;
-      });
-      _showErrorSnackBar('Failed to select scenery');
-    }
-  }
-
   void _showErrorSnackBar(String message) {
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -314,116 +351,16 @@ class _ShopPageState extends State<ShopPage>
     }
   }
 
-  Widget _buildPreviewArea() {
-    final selectedCharacter = _shopData?.allCharacters.firstWhere(
-      (char) => char.id == _selectedCharacterId,
-      orElse: () => _shopData!.chosenCharacter ?? _shopData!.allCharacters.first,
-    );
-    
-    final selectedScenery = _shopData?.allSceneries.firstWhere(
-      (scenery) => scenery.id == _selectedSceneryId,
-      orElse: () => _shopData!.chosenScenery ?? _shopData!.allSceneries.first,
-    );
-
-    return Container(
-      height: 300,
-      width: double.infinity,
-      margin: const EdgeInsets.symmetric(horizontal: 16),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.15),
-            blurRadius: 15,
-            offset: const Offset(0, 8),
-          ),
-        ],
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(20),
-        child: Stack(
-          children: [
-            // Scenery background
-            if (selectedScenery != null)
-              Positioned.fill(
-                child: Image.asset(  
-                  'assets/scenery/${selectedScenery.fileName}',
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) {
-                    developer.log('Scenery image error: $error');
-                    return Container(
-                      color: Colors.grey[300],
-                      child: const Icon(
-                        Icons.landscape,
-                        size: 64,
-                        color: Colors.grey,
-                      ),
-                    );
-                  },
-                ),
-              ),
-            
-            // Character foreground
-            if (selectedCharacter != null)
-              Positioned(
-                bottom: 20,
-                left: 0,
-                right: 0,
-                child: Center(
-                  child: SizedBox(  
-                    width: 120,
-                    height: 120,
-                    child: Image.asset(
-                      'assets/character/${selectedCharacter.fileName}',
-                      fit: BoxFit.contain,
-                      errorBuilder: (context, error, stackTrace) {
-                        developer.log('Character image error: $error');
-                        return const Icon(
-                          Icons.person,
-                          size: 64,
-                          color: Colors.grey,
-                        );
-                      },
-                    ),
-                  ),
-                ),
-              ),
-            
-            // Fallback if no items selected
-            if (selectedCharacter == null && selectedScenery == null)
-              Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      const Color(0xFF2E77C3),
-                      const Color(0xFF2E77C3),
-                    ],
-                  ),
-                ),
-                child: const Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.landscape, size: 64, color: Colors.white),
-                      SizedBox(height: 16),
-                      Text(
-                        'Select character and scenery',
-                        style: TextStyle(
-                          fontSize: 18,
-                          color: Colors.white,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-          ],
+  void _showSuccessSnackBar(String message) {
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(message),
+          backgroundColor: Colors.green[600], 
+          behavior: SnackBarBehavior.floating,
         ),
-      ),
-    );
+      );
+    }
   }
 
   Widget _buildTabButtons() {
@@ -485,12 +422,14 @@ class _ShopPageState extends State<ShopPage>
 
   Widget _buildShopGrid() {
     final items = _currentTab == ShopTab.character
-        ? _shopData?.allCharacters.cast<ShopItem>() ?? []
-        : _shopData?.allSceneries.cast<ShopItem>() ?? [];
-
-    final selectedId = _currentTab == ShopTab.character
-        ? _selectedCharacterId
-        : _selectedSceneryId;
+        ? _shopData?.unobtainedCharacters
+            .where((item) => item.rarity.toLowerCase() != 'legendary')
+            .cast<ShopItem>()
+            .toList() ?? []
+        : _shopData?.unobtainedSceneries
+            .where((item) => item.rarity.toLowerCase() != 'legendary')
+            .cast<ShopItem>()
+            .toList() ?? [];
 
     return Container(
       decoration: BoxDecoration(
@@ -505,13 +444,10 @@ class _ShopPageState extends State<ShopPage>
         itemCount: items.length,
         itemBuilder: (context, index) {
           final item = items[index];
-          final isSelected = item.id == selectedId;
-
           return Padding(
             padding: const EdgeInsets.only(bottom: 16), 
             child: ShopItemCard(
               item: item,
-              isSelected: isSelected,
               isCharacter: _currentTab == ShopTab.character,
               onTap: () {
                 _showItemPreviewPopup(item, _currentTab == ShopTab.character);
@@ -585,21 +521,21 @@ class _ShopPageState extends State<ShopPage>
             ? _buildErrorState()
             : FadeTransition(
                 opacity: _fadeAnimation,
-                child: Column(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(top: 20, bottom: 24),
-                      child: _buildPreviewArea(),
-                    ),
-                    
-                    _buildTabButtons(),
-                    
+                child: SafeArea(
+                  child: Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(top: 20),
+                        child: _buildTabButtons(),
+                      ),
+
                     const SizedBox(height: 20),
                     
                     Expanded(
                       child: _buildShopGrid(),
                     ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
     );
