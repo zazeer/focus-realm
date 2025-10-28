@@ -132,7 +132,7 @@ class UserResponse {
 
 class UserApiService {
   static final logger = Logger();
-  static const String baseUrl = 'http://localhost:8080'; 
+  static const String baseUrl = 'https://focus-realm-app.azurewebsites.net'; 
   
   static const Map<String, String> headers = {
     'Content-Type': 'application/json',
