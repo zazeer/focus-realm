@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:logger/logger.dart';
 
-// Model untuk User
 class UserModel {
   final String? user_Id;
   final String? music_Id;
@@ -111,22 +110,6 @@ class HomePageModel {
   }
 }
 
-class CustomizationPageModel {
-  final String userId;
-
-  CustomizationPageModel({
-    required this.userId,
-  });
-
-  factory CustomizationPageModel.fromJson(Map<String, dynamic> json) {
-    return CustomizationPageModel(
-      userId: json['user_id'] ?? '',
-    );
-  }
-
-}
-
-// Model untuk Response
 class UserResponse {
   final String? errorCode;
   final String? errorMessage;
@@ -147,18 +130,14 @@ class UserResponse {
   }
 }
 
-// Service untuk API calls
 class UserApiService {
   static final logger = Logger();
-  // Ganti dengan URL backend kamu
   static const String baseUrl = 'http://localhost:8080'; 
   
-  // Headers untuk request
   static const Map<String, String> headers = {
     'Content-Type': 'application/json',
   };
 
-  // Fungsi untuk Register
   static Future<UserResponse> registerUser(UserModel user) async {
     try {
       final response = await http.post(
@@ -184,7 +163,7 @@ class UserApiService {
     }
   }
 
-  // Fungsi untuk Login
+  // Login user
   static Future<UserResponse> loginUser(UserModel user) async {
     try {
       logger.i('Attempting to login user: ${user}');
@@ -238,36 +217,5 @@ class UserApiService {
       return null;
     }
   }
-
-  static Future<CustomizationPageModel?> fetchCustomizationPageData(String userId) async {
-    try {
-      final response = await http.post(
-        Uri.parse('$baseUrl/customization_page/fetch_customization_page_by_user_id'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'user_id': userId}),
-      );
-
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        logger.i('Customization page data: $data');
-        
-        // Cek apakah response sukses
-        if (data['errorCode'] == '200' && data['customizationPageModel'] != null) {
-          // Ambil data dari customizationPageModel
-          return CustomizationPageModel(
-            userId: data['customizationPageModel']['user_id'] ?? '',
-          );
-        }
-      }
-      return null;
-    } catch (e) {
-      print('Error fetching customization page data: $e');
-      return null;
-    }
-  }
-
-
-
-
 
 }
