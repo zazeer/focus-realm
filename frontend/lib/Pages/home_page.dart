@@ -156,11 +156,11 @@ class _HomePageState extends State<HomePage> {
                   
                   // Game Scene Container
                   Positioned(
-                    bottom: 15,
+                    bottom: 20,
                     left: 20,
                     right: 20,
                     child: Container(
-                      height: 180,
+                      height: 200,
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
                         color: const Color(0xFF87CEEB), // Sky blue background
@@ -174,7 +174,7 @@ class _HomePageState extends State<HomePage> {
                           
                           // Character placeholder
                           Positioned(
-                            bottom: 20,
+                            bottom: 30,
                             left: MediaQuery.of(context).size.width * 0.4,
                             child: _buildCharacterPlaceholder(),
                           ),

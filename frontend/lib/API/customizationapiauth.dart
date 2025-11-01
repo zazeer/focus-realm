@@ -185,7 +185,7 @@ class CustomizationPageResponse {
 }
 
 class UserApiService{
-  static const String baseUrl = 'http://localhost:8080';
+  static const String baseUrl = 'https://focus-realm-app.azurewebsites.net';
 
    static Future<CustomizationPageModel?> fetchCustomizationPageData(String userId) async {
     final uri = Uri.parse('$baseUrl/customization_page/fetch_customization_page_by_user_id');
