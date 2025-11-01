@@ -141,7 +141,7 @@ class UserApiService {
   static Future<UserResponse> registerUser(UserModel user) async {
     try {
       final response = await http.post(
-        Uri.parse('$baseUrl/user/insert_user'),
+        Uri.parse('$baseUrl/login_page/insert_user'),
         headers: headers,
         body: jsonEncode(user.toJson()),
       );
@@ -168,7 +168,7 @@ class UserApiService {
     try {
       logger.i('Attempting to login user: ${user}');
       final response = await http.post(
-        Uri.parse('$baseUrl/user/fetch_user'),
+        Uri.parse('$baseUrl/login_page/fetch_user'),
         headers: headers,
         body: jsonEncode(user.toJson()),
       );

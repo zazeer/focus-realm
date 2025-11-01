@@ -1,4 +1,5 @@
 import 'dart:developer' as developer;
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter/material.dart';
 import 'shop_models.dart';
 
@@ -7,12 +8,14 @@ class ShopItemCard extends StatelessWidget {
   final ShopItem item;  
   final bool isCharacter;
   final VoidCallback onTap;
+  final String userId;
 
   const ShopItemCard({
     Key? key,
     required this.item,
     required this.isCharacter,
     required this.onTap,
+    required this.userId,
   }) : super(key: key);
 
   @override
@@ -182,6 +185,8 @@ class ShopItemCard extends StatelessWidget {
       return Colors.grey;
     }
   }
+
+  
 }
 
 /// Widget untuk loading state

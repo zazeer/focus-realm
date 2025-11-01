@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../models/gallery_models.dart';
 import '../services/gallery_service.dart';
 import '../widgets/gallery_widgets.dart';
+import 'package:frontend/features/widgets/navigation_bar.dart';
 
 enum GalleryTab { character, scenery }
 
@@ -448,6 +449,10 @@ class _GalleryPageState extends State<GalleryPage>
                     
                     Expanded(
                       child: _buildGalleryGrid(),
+                    ),
+                    CustomNavigationBar(
+                      userId: widget.userId,
+                      selectedIndex: 3, // 3 = gallery
                     ),
                   ],
                 ),

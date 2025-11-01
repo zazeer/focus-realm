@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'shop_models.dart';
 import 'shop_service.dart';
 import 'shop_widgets.dart';
+import 'package:frontend/features/widgets/navigation_bar.dart'; 
 
 enum ShopTab { character, scenery }
 
@@ -452,6 +453,7 @@ class _ShopPageState extends State<ShopPage>
               onTap: () {
                 _showItemPreviewPopup(item, _currentTab == ShopTab.character);
               },
+              userId: widget.userId,
             ),
           );
         },
@@ -533,6 +535,10 @@ class _ShopPageState extends State<ShopPage>
                     
                     Expanded(
                       child: _buildShopGrid(),
+                    ),
+                    CustomNavigationBar(
+                      userId: widget.userId,
+                      selectedIndex: 1, // 1 = shop
                     ),
                     ],
                   ),

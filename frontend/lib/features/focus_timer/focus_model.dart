@@ -72,8 +72,8 @@ class FocusTimerModel {
   String? character_file_name;
   FocusMusic? currentMusicModel;
   FocusAmbient? currentAmbientModel;
-  List<FocusMusic> allMusicList;
-  List<FocusAmbient> allAmbientList;
+  List<FocusMusic>? allMusicList;
+  List<FocusAmbient>? allAmbientList;
 
   FocusTimerModel({
     required this.user_id,
@@ -100,8 +100,8 @@ class FocusTimerModel {
       'character_file_name': character_file_name,
       'currentMusicModel': currentMusicModel?.toJson(),
       'currentAmbientModel': currentAmbientModel?.toJson(),
-      'allMusicList': allMusicList.map((e) => e.toJson()).toList(),
-      'allAmbientList': allAmbientList.map((e) => e.toJson()).toList(),
+      'allMusicList': allMusicList?.map((e) => e.toJson()).toList(),
+      'allAmbientList': allAmbientList?.map((e) => e.toJson()).toList(),
     };
   }
 
@@ -129,8 +129,6 @@ class FocusTimerModel {
     );
   }
 }
-
-
 
 // API Response Model
 class FocusPageResponseModel {

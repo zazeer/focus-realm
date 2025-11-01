@@ -1,16 +1,19 @@
 import 'dart:developer' as developer;
 import 'package:flutter/material.dart';
 import '../models/gallery_models.dart';
+import 'package:frontend/features/widgets/navigation_bar.dart';
 
 /// Widget untuk menampilkan preview hero area
 class HeroPreviewWidget extends StatefulWidget {
   final GalleryItem item;
   final bool isCharacter;
+  final String userId;
 
   const HeroPreviewWidget({
     Key? key,
     required this.item,
     required this.isCharacter,
+    required this.userId,
   }) : super(key: key);
 
   @override

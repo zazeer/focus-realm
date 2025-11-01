@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:frontend/API/userapiauth.dart';
 import 'package:frontend/Pages/profile_page.dart'; // Tambahkan import ini
 import 'package:frontend/Pages/custom_time.dart';
+import 'package:frontend/features/gallery/presentations/gallery_page.dart';
+import 'package:frontend/features/shop/shop_page.dart';
+import 'package:frontend/features/widgets/navigation_bar.dart';
 
 class HomePage extends StatefulWidget {
   final String userId;
@@ -327,29 +330,9 @@ class _HomePageState extends State<HomePage> {
             ),
 
             // Bottom Navigation
-            Container(
-              height: 70,
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              decoration: BoxDecoration(
-                color: Color(0xFFF9FBFF),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
-                    blurRadius: 10,
-                    offset: const Offset(0, -5),
-                  ),
-                ],
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  _buildNavItem(Icons.explore, false),
-                  _buildNavItem(Icons.shopping_bag, false),
-                  _buildNavItem(Icons.home, true),
-                  _buildNavItem(Icons.assessment, false),
-                  _buildNavItem(Icons.person, false),
-                ],
-              ),
+            CustomNavigationBar(
+              userId: widget.userId,
+              selectedIndex: 2, // 2 = home
             ),
           ],
         ),
@@ -473,44 +456,6 @@ class _HomePageState extends State<HomePage> {
               textAlign: TextAlign.center,
             ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildNavItem(IconData icon, bool isSelected) {
-    return GestureDetector(
-      onTap: () {
-        // Navigasi berdasarkan icon yang ditekan
-        if (icon == Icons.person) {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => ProfilePage(userId: widget.userId),
-            ),
-          );
-        }
-        // Tambahkan navigasi lain jika diperlukan
-        // else if (icon == Icons.explore) {
-        //   // Navigate to explore page
-        // }
-        // else if (icon == Icons.shopping_bag) {
-        //   // Navigate to shop page
-        // }
-        // else if (icon == Icons.assessment) {
-        //   // Navigate to statistics page
-        // }
-      },
-      child: Container(
-        padding: const EdgeInsets.all(8),
-        decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFF4C9EEB) : Colors.transparent,
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Icon(
-          icon,
-          color: isSelected ? Color(0xFFF9FBFF) : Colors.grey,
-          size: 28,
-        ),
       ),
     );
   }
